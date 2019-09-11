@@ -26,6 +26,29 @@ def _get_server_address(op):
         proto = 'https' if https else 'http'
         return Server(proto, ip, port, op.name)
 
+
+def _job_new_incarnation(job):
+    """Obtain the full server information for a job
+    for a new job or modified job (change of generation id)
+
+    Returns an object with all the required job information
+    and REST endpoints or None if the job does not contain
+    any REST operators.
+    """
+    rest_job = None
+    for op in job.get_operators():
+        if op.operatorKind.startswith('com.ibm.streamsx.inet.rest::'):
+            if not rest_job:
+                rest_job = {'servers':set(), 'ops':dict(), 'pes':dict()}
+                for k in ['name', 'generationId']:
+                    rest_job[k] = job[k]
+                        
+            rest_job['ops'][op.name] = {'kind':op.operatorKind}
+            server = _get_server_address(op)
+            if server:
+                rest_job['servers'].add(server)
+    return rest_job
+
 class EndpointMonitor(object):
     def __init__(self, resource_url, config, job_filter, verify=None):
         self._jobs = {}
@@ -53,13 +76,10 @@ class EndpointMonitor(object):
                 continue
             if 'running' != job.status:
                 continue
-            for op in j.get_operators():
-                if op.operatorKind.startswith('com.ibm.streamsx.inet.rest::'):
-                    if not j.id in jobs:
-                        jobs[j.id] = {'servers':set(), 'name':j.name}
-                    server = _get_server_address(op)
-                    if server:
-                        jobs[j.id]['servers'].add(server)
+
+            rest_job = _job_new_incarnation(j)
+            if rest_job:
+                jobs[j.id] = rest_job
 
         return jobs
 
