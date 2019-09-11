@@ -45,12 +45,15 @@ Current support is limited to:
  * HTTP operators only
  * Single web-server per job
      * The web-server can be hosting multiple REST operators that are fused into a single PE
+ * Port number should be zero or a non-system port.
 
 For a web-server in a job its URLs are exposed with the path:
 
  * `streams/job/`*jobid*`/`
  
- For example:
+ (plan is to support job names as the fixed path).
+ 
+ For example with a web-server in job 7:
  
  * `streams/job/7/ports/info`
  
