@@ -1,9 +1,15 @@
 # endpoint-monitor
 Nginx reverse proxy sample application to Streams REST operators.
 
-# Under development
+# UNDER DEVELOPMENT
 
-**Application is under development, apis etc. are subject to change.**
+**Application is under development, apis, behavior etc. are subject to change.**
+
+# Overview
+
+Endpoint-monitor is an Openshift application that monitors running jobs in a single Streams instance (within the same cluster) for REST SPL operators, such as `com.ibm.streamsx.inet.rest::HTTPJSONInjection` and `com.ibm.streamsx.inet.rest::HTTPTupleView`.
+
+The endpoints from the REST operators are then exposed with fixed URLs through a service using an Nginx reverse proxy. Thus if a PE hosting a REST operator restarts and changes its IP address and/or server port number endpoint-monitor will update the nginx configuration to allow the fixed URL to find the operator correctly.
 
 # Setup
 
@@ -31,5 +37,23 @@ In the deployment configuration for *application-name* add the environment varia
 After steps 2,3,4 the configuration for container streams-endpoint-monitor should look like:
 
 <img width="1244" alt="image" src="https://user-images.githubusercontent.com/3769612/64719577-5e52dc80-d47d-11e9-97d3-cada3f817525.png">
+
+# URL mapping
+
+Current support is limited to:
+
+ * HTTP operators only
+ * Single web-server per job
+     * The web-server can be hosting multiple REST operators that are fused into a single PE
+
+For a web-server in a job its URLs are exposed with the path:
+
+ * `streams/job/`*jobid*`/`
+ 
+ For example:
+ 
+ * `streams/job/7/ports/info`
+ 
+ 
 
 
