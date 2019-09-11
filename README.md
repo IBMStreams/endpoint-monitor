@@ -48,6 +48,7 @@ Current support is limited to:
  * Single web-server per job
      * The web-server can be hosting multiple REST operators that are fused into a single PE
  * Port number should be zero or a non-system port.
+ * Currently all jobs are monitored for endpoints, job filtering will be added.
 
 For a web-server in a job its URLs are exposed with prefix path:
 
