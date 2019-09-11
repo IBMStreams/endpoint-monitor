@@ -74,7 +74,7 @@ class EndpointMonitor(object):
         for j in self.instance.get_jobs():
             if not self._job_filter(j):
                 continue
-            if 'running' != job.status:
+            if 'running' != j.status:
                 continue
 
             rest_job = _job_new_incarnation(j)
