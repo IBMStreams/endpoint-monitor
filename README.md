@@ -44,7 +44,7 @@ After steps 2,3,4 the configuration for container streams-endpoint-monitor shoul
 
 Current support is limited to:
 
- * HTTP operators only
+ * HTTP & HTTPS operators
  * Single web-server per job
      * The web-server can be hosting multiple REST operators that are fused into a single PE
  * Port number should be zero or a non-system port.
