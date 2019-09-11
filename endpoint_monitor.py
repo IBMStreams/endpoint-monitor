@@ -41,7 +41,7 @@ def _job_new_incarnation(job):
             if not rest_job:
                 rest_job = {'servers':set(), 'ops':dict(), 'pes':dict()}
                 for k in ['name', 'generationId']:
-                    rest_job[k] = job[k]
+                    rest_job[k] = getattr(job, k)
                         
             rest_job['ops'][op.name] = {'kind':op.operatorKind}
             server = _get_server_address(op)
