@@ -47,7 +47,7 @@ Current support is limited to:
      * The web-server can be hosting multiple REST operators that are fused into a single PE
  * Port number should be zero or a non-system port.
 
-For a web-server in a job its URLs are exposed with the path:
+For a web-server in a job its URLs are exposed with prefix path:
 
  * `streams/job/`*jobid*`/`
  
@@ -57,6 +57,6 @@ For a web-server in a job its URLs are exposed with the path:
  
  * `streams/job/7/ports/info`
  
- 
+ The path is against the service *application-name*.
 
 
