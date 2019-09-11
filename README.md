@@ -20,6 +20,8 @@ oc new-app \
  -f https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/master/openshift/templates/streams-endpoints.json -p NAME=<application-name>
 ```
 
+The containers in the created pods (once the builds complete) will fail until steps 2,3,4 are completed. There is no additional action required after steps 2,3,4 , Openshift will restart the pod due to the change in configuraiton.
+
 2. Define the Streams instance to be monitored.
 
 In the deployment configuration for *application-name* add the environment variable ``STREAMS_ENDPOINT_INSTANCE_URL`` to the container streams-endpoint-monitor.
