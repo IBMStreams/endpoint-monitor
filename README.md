@@ -23,7 +23,13 @@ In the deployment configuration for *application-name* add the environment varia
 
  * `STREAMS_USERNAME` - User identifier for Streams user.
  * `STREAMS_PASSWORD` - Password for Streams user.
+ 
+ <img width="236" alt="image" src="https://user-images.githubusercontent.com/3769612/64719622-7d516e80-d47d-11e9-9cb3-c90bc4406de5.png">
 
+4. Add the secret from step 3. to the environment of container streams-endpoint-monitor in the deployment configuration for *application-name*.
 
+After steps 2,3,4 the configuration for container streams-endpoint-monitor should look like:
+
+<img width="1244" alt="image" src="https://user-images.githubusercontent.com/3769612/64719577-5e52dc80-d47d-11e9-97d3-cada3f817525.png">
 
 
