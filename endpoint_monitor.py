@@ -10,13 +10,16 @@ import streamsx.rest_primitives
 Server = collections.namedtuple('Server', ['proto', 'ip', 'port', 'oid'])
 
 def _get_server_address(op):
+    print('OP', op.name)
     pe = op.get_pe()
     # No get_resource on PE
     pe_resource = streamsx.rest_primitives.Resource(pe.rest_client.make_request(pe.resource), pe.rest_client)
     ip = pe_resource.ipAddress
+    print('  PE', pe.id, ip)
     port = None
     https = None
     for m in op.get_metrics():
+        print('  METRIC', m.name, m.value)
         if m.name == 'serverPort':
             port = m.value
         elif m.name == 'https':
