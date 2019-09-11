@@ -2,7 +2,7 @@
   "kind": "Template",
   "apiVersion": "v1",
   "metadata": {
-    "name": "os-test-py",
+    "name": "streams-endpoint-monitor",
     "annotations": {
       "openshift.io/display-name": "Streams endpoint-monitor",
       "description": "Nginx reverse proxy application that exposes REST endpoints from Streams jobs. For more information about using this template, see https://github.com/IBMStreams/endpoint-monitor/blob/master/README.md.",
@@ -16,7 +16,7 @@
   },
   "message": "The following service(s) have been created in your project: ${NAME}.\n\nFor more information about using this template, see https://github.com/IBMStreams/endpoint-monitor/blob/master/README.md.",
   "labels": {
-    "template": "endpoint-monitor"
+    "template": "streams-endpoint-monitor"
   },
   "objects": [
     {
@@ -291,7 +291,7 @@
       "displayName": "Name",
       "description": "The name assigned to all of the frontend objects defined in this template.",
       "required": true,
-      "value": "os-test-py"
+      "value": "streams-endpoint-monitor"
     },
     {
       "name": "NAMESPACE",
