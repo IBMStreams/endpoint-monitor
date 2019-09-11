@@ -45,9 +45,13 @@ class EndpointMonitor(object):
         return self._ins
 
     def _survey_jobs(self):
+        """ Detect all jobs with REST operators.
+        """
         jobs = {}
         for j in self.instance.get_jobs():
             if not self._job_filter(j):
+                continue
+            if 'running' != job.status:
                 continue
             for op in j.get_operators():
                 if op.operatorKind.startswith('com.ibm.streamsx.inet.rest::'):
