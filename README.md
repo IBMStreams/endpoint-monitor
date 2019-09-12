@@ -29,7 +29,7 @@ oc new-app \
 
 The containers in the created pods (once the builds complete) will fail until steps 2,3,4 are completed. There is no additional action required after steps 2,3,4 , Openshift will restart the pod due to the change in configuraiton.
 
-2. Create a kubernetes secret that identifies a Streams instance user that has authorization to view job information through the Streams REST api:
+2. Create a kubernetes secret that identifies a Streams instance user that has authorization to view job information for the selected job group(s) through the Streams REST api:
 
  * `STREAMS_USERNAME` - User identifier for Streams user.
  * `STREAMS_PASSWORD` - Password for Streams user.
