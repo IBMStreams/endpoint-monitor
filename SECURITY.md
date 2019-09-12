@@ -5,7 +5,7 @@
 Endpoint-monitor automatically creates endpoints that proxy to Streams REST operators.
 So if a job is submitted that *endpoint-monitor* has visibility to then an endpoint is created automatically.
 If the *endpoint-monitor* nginx service is visible outside of the Openshift cluster (and potentially all the way
-to the public internet) then these new endpoints will be externally visible. Thus there needs to be control over
+to the public internet) then these new endpoints will automatically become externally visible. Thus there needs to be control over
 who can create endpoints.
 
 Authorization for endpoint creation is by:
