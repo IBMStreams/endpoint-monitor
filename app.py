@@ -19,7 +19,8 @@ print("IBMStreamsInstance:", instance_name)
 print("SWS Service:", sws_service)
 
 job_group_pattern = os.environ['STREAMSX_ENDPOINT_JOB_GROUP']
-job_filter = lambda job : re.match(job_group_pattern, job.jobGroup)
+#job_filter = lambda job : re.match(job_group_pattern, job.jobGroup)
+job_filter = lambda job : job.jobGroup.endswith('/'+job_group_pattern)
 print("Job group pattern:", job_group_pattern)
 
 cfg = FileWriter(location='/opt/streams_job_configs')
