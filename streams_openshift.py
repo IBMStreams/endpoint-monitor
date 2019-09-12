@@ -15,8 +15,8 @@ def _find_env_var(pattern):
 
 def get_sws_service(instance_name):
     ievn = _convert_name_to_ev(instance_name)
-    host = os.environ.get(ievn + '_SWS_SERVICE_HOST')
-    port = os.environ.get(ievn + '_SWS_SERVICE_PORT')
+    host = _find_env_var(ievn + '_[0-9A-Z]+_SWS_SERVICE_HOST')
+    port = _find_env_var(ievn + '_[0-9A-Z]+_SWS_SERVICE_PORT')
     if host and port:
         return urlunsplit(('https', host, port, None, None))
 
