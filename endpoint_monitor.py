@@ -10,16 +10,13 @@ import streamsx.rest_primitives
 Server = collections.namedtuple('Server', ['proto', 'ip', 'port', 'oid'])
 
 def _get_server_address(op):
-    print('OP', op.name)
     pe = op.get_pe()
     # No get_resource on PE
     pe_resource = streamsx.rest_primitives.Resource(pe.rest_client.make_request(pe.resource), pe.rest_client)
     ip = pe_resource.ipAddress
-    print('  PE', pe.id, ip)
     port = None
     https = None
     for m in op.get_metrics():
-        print('  METRIC', m.name, m.value)
         if m.name == 'serverPort':
             port = m.value
         elif m.name == 'https':
@@ -53,9 +50,9 @@ def _job_new_incarnation(job):
     return rest_job
 
 class EndpointMonitor(object):
-    def __init__(self, resource_url, config, job_filter, verify=None):
+    def __init__(self, endpoint, config, job_filter, verify=None):
         self._jobs = {}
-        self._url = resource_url
+        self._url = endpoint + '/streams/rest/resources'
         self._config = config
         self._job_filter = job_filter
         self._verify = verify
