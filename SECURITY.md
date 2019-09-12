@@ -10,10 +10,12 @@ who can create endpoints.
 
 Authorization for endpoint creation is by:
 
-1. Openshift permissions
+### Openshift permissions
+
   * Ability to create (using `oc new-app`) the *endpoint-monitor* application
   * Ability to expose the *endpoint-monitor* nginx service externally
-1. Streams permissions
+  
+### Streams permissions
   * Ability for the Streams user monitoring the Streams instance to obtain job information.
      * If the user only see a subset of jobs (e.g. a single job group) then only those Streams users who can
        submit jobs into that group can create endpoints.
