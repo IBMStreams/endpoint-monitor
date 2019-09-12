@@ -255,7 +255,7 @@
                     }
                 },
                 "env": [
-                  {"name": "STREAMSX_ENDPOINT_INSTANCE", "value": "${STREAMS_INSTANCE}"}
+                  {"name": "STREAMSX_ENDPOINT_INSTANCE", "value": "${STREAMS_INSTANCE_NAME}"}
                 ]
               }
             ]
@@ -295,8 +295,8 @@
       "value": "streams-endpoint-monitor"
     },
     {
-      "name": "STREAMS_INSTANCE",
-      "displayName": "Streams Instance",
+      "name": "STREAMS_INSTANCE_NAME",
+      "displayName": "Streams Instance name",
       "description": "Name of the IBM Streams instance (kind IBMStreamsInstance) to monitor.",
       "required": true
     },
