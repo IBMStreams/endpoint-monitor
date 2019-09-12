@@ -17,26 +17,27 @@ The endpoints from the REST operators are then exposed with fixed URLs through a
 
 ```
 oc new-app \
- -f https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/master/openshift/templates/streams-endpoints.json -p NAME=<application-name>
+ -f https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/master/openshift/templates/streams-endpoints.json \
+ -p NAME=<application-name> \
+ -p STREAMS_INSTANCE_NAME=<IBMStreamsInstance name>
 ```
+
+The value for `STREAMS_INSTANCE_NAME` is name of the Kubernetes object `IBMStreamsInstance` defined in the yaml file when creating the Streams instance.
 
 The containers in the created pods (once the builds complete) will fail until steps 2,3,4 are completed. There is no additional action required after steps 2,3,4 , Openshift will restart the pod due to the change in configuraiton.
 
-2. Define the Streams instance to be monitored.
-
-In the deployment configuration for *application-name* add the environment variable ``STREAMS_ENDPOINT_INSTANCE_URL`` to the container streams-endpoint-monitor.
-
-
-3. Create a kubernetes secret that identifies a Streams instance user that has authorization to view job information through the Streams REST api:
+2. Create a kubernetes secret that identifies a Streams instance user that has authorization to view job information through the Streams REST api:
 
  * `STREAMS_USERNAME` - User identifier for Streams user.
  * `STREAMS_PASSWORD` - Password for Streams user.
  
  <img width="236" alt="image" src="https://user-images.githubusercontent.com/3769612/64719622-7d516e80-d47d-11e9-9cb3-c90bc4406de5.png">
 
-4. Add the secret from step 3. to the environment of container streams-endpoint-monitor in the deployment configuration for *application-name*.
+3. Add the secret from step 3. to the environment of container streams-endpoint-monitor in the deployment configuration for *application-name*.
 
-After steps 2,3,4 the configuration for container streams-endpoint-monitor should look like:
+After steps 2,3 the configuration for container streams-endpoint-monitor should look like:
+
+_image is out of date - the environment variable is now STREAMSX_ENDPOINT_INSTANCE and is set automatically_
 
 <img width="1244" alt="image" src="https://user-images.githubusercontent.com/3769612/64719577-5e52dc80-d47d-11e9-97d3-cada3f817525.png">
 
