@@ -13,6 +13,9 @@ sws_service = streams_openshift.get_sws_service(instance_name)
 
 if not sws_service:
     raise ValueError("Cannot find Streams SWS service for instance {0}".format(instance_name))
+    
+print("IBMStreamsInstance", instance_name)
+print("SWS Service", sws_service)
 
 cfg = FileWriter(location='/opt/streams_job_configs')
 
