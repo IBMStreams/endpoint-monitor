@@ -256,6 +256,7 @@
                 },
                 "env": [
                   {"name": "STREAMSX_ENDPOINT_INSTANCE", "value": "${STREAMS_INSTANCE_NAME}"}
+                  {"name": "STREAMSX_ENDPOINT_JOB_GROUP", "value": "${JOB_GROUP}"}
                 ]
               }
             ]
@@ -298,6 +299,12 @@
       "name": "STREAMS_INSTANCE_NAME",
       "displayName": "Streams Instance name",
       "description": "Name of the IBM Streams instance (kind IBMStreamsInstance) to monitor.",
+      "required": true
+    },
+    {
+      "name": "JOB_GROUP",
+      "displayName": "Streams job group regular expression",
+      "description": "Regular expression to match monitored job groups.",
       "required": true
     },
     {

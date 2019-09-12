@@ -1,4 +1,5 @@
 import os
+import re
 import streamsx.scripts.info as info
 
 from file_config import FileWriter
@@ -14,12 +15,16 @@ sws_service = streams_openshift.get_sws_service(instance_name)
 if not sws_service:
     raise ValueError("Cannot find Streams SWS service for instance {0}".format(instance_name))
     
-print("IBMStreamsInstance", instance_name)
-print("SWS Service", sws_service)
+print("IBMStreamsInstance:", instance_name)
+print("SWS Service:", sws_service)
+
+job_group_pattern = os.environ['STREAMSX_JOB_GROUP']
+job_filter = lambda job : re.match(job_group_pattern, job.jobGroup)
+print("Job group pattern:", job_group_pattern)
 
 cfg = FileWriter(location='/opt/streams_job_configs')
 
-em = EndpointMonitor(endpoint=sws_service, config=cfg, job_filter=lambda job: True, verify=False)
+em = EndpointMonitor(endpoint=sws_service, config=cfg, job_filter=job_filter, verify=False)
 em.run()
 
 
