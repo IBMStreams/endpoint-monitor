@@ -19,10 +19,13 @@ The endpoints from the REST operators are then exposed with fixed URLs through a
 oc new-app \
  -f https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/master/openshift/templates/streams-endpoints.json \
  -p NAME=<application-name> \
- -p STREAMS_INSTANCE_NAME=<IBMStreamsInstance name>
+ -p STREAMS_INSTANCE_NAME=<IBMStreamsInstance name> \
+ -p JOB_GROUP=<job group pattern>
 ```
 
-The value for `STREAMS_INSTANCE_NAME` is name of the Kubernetes object `IBMStreamsInstance` defined in the yaml file when creating the Streams instance.
+* `NAME` - Name of the openshift/kubernetes service that provides access to the REST endpointd
+* `STREAMS_INSTANCE_NAME` - Name of the Kubernetes object `IBMStreamsInstance` defined in the yaml file when creating the Streams instance.
+* `JOB_GROUP` - Job group pattern. Only jobs with groups that match this pattern will be monitored for REST operators. **Currently only a actual job group can be supplied, not a regular expression.**
 
 The containers in the created pods (once the builds complete) will fail until steps 2,3,4 are completed. There is no additional action required after steps 2,3,4 , Openshift will restart the pod due to the change in configuraiton.
 
