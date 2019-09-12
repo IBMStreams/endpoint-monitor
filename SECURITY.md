@@ -2,7 +2,7 @@
 
 ## Creation of endpoints
 
-Endpoint-monitor automatically creates endpoints that proxy to a Streams REST operators.
+Endpoint-monitor automatically creates endpoints that proxy to Streams REST operators.
 So if a job is submitted that *endpoint-monitor* has visibility to then an endpoint is created automatically.
 If the *endpoint-monitor* nginx service is visible outside of the Openshift cluster (and potentially all the way
 to the public internet) then these new endpoints will be externally visible. Thus there needs to be control over
@@ -32,9 +32,11 @@ Visibility of this webserver (ip address/port combination) is limited by Kuberne
 https://kubernetes.io/docs/concepts/cluster-administration/networking/
 
 At the very least pods within the same namespace are likely to have visibility into the pod containing a Streams REST operator,
-so a pod within the same namespace could try to inject tuples or access tuples from a Streams REST operator.
+so a pod within the same namespace could try to maliciously inject tuples or access tuples from a Streams REST operator.
 
-Since a pod containing a Streams REST operator has variable ip address (and port will to be variable if `port:0` is used)
-direct access should not be used by an application, only through the *endpoint-monitor* nginx service.
+Since a pod containing a Streams REST operator has a variable ip address (and port will also be variable if `port:0` is used)
+direct access should not be used by non-malicious applications, only through the *endpoint-monitor* nginx service.
 
 So the only authorized user for the Jetty server should be its intended *endpoint-monitor*.
+
+**Details to be added on client certs.**
