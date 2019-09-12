@@ -3,7 +3,6 @@
 
 import os
 import re
-from urllib.parse import urlunsplit
 
 def _convert_name_to_ev(name):
     return name.upper().replace('-', '_')
@@ -18,6 +17,6 @@ def get_sws_service(instance_name):
     host = _find_env_var(ievn + '_[0-9A-Z]+_SWS_SERVICE_HOST')
     port = _find_env_var(ievn + '_[0-9A-Z]+_SWS_SERVICE_PORT')
     if host and port:
-        return urlunsplit(('https', host, port, None, None))
+        return 'https://{0}:{1}'.format(host, port)
 
 
