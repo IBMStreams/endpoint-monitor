@@ -18,7 +18,7 @@ if not sws_service:
 print("IBMStreamsInstance:", instance_name)
 print("SWS Service:", sws_service)
 
-job_group_pattern = os.environ['STREAMSX_JOB_GROUP']
+job_group_pattern = os.environ['STREAMSX_ENDPOINT_JOB_GROUP']
 job_filter = lambda job : re.match(job_group_pattern, job.jobGroup)
 print("Job group pattern:", job_group_pattern)
 
