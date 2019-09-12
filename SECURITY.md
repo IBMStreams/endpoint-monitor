@@ -40,3 +40,11 @@ direct access should not be used by non-malicious applications, only through the
 So the only authorized user for the Jetty server should be its intended *endpoint-monitor*.
 
 **Details to be added on client certs.**
+
+## Security of the application endpoints
+
+Creation of an *endpoint-monitor* through `oc new-app` does **not** expose the service outside of the cluster.
+
+The endpoints created by *endpoint-monitor* are visble within the cluster through the nginx service endpoint according to Kubernetes networking for services. https://kubernetes.io/docs/concepts/services-networking/service/
+
+**Details to be added on client certs/niginx authentication.**
