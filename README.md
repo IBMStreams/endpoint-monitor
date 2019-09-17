@@ -69,6 +69,8 @@ For a web-server in a job its URLs are exposed with prefix path:
 # Implementation notes
 
 The template uses the nginx and python 3.6 source to image (s2i) setups to define two containers (nginx & python) within a single pod. The two containers share a local volume (`/opt/streams_job_configs`) and communicate through a named pipe on the volume.
+ * nginx 1.12 s2i - https://github.com/sclorg/nginx-container/tree/master/1.12
+ * python 3.6 s2i - tbd
 
 The python container monitors the Streams instance using the REST api through its sws service and as jobs are submitted and canceled it updates each job's reverse proxy configuration in `/opt/streams_job_configs`. Once a job configuration has been written it sends a `reload` action through the named pipe.
 
