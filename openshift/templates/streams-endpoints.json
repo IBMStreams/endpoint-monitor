@@ -212,7 +212,7 @@
           "spec": {
             "volumes": [
                 {"name": "nginx-job-configs", "emptyDir": {}},
-                {"name": "nginx-server-cert", "secret": {"name": "${NAME}-cert"}},
+                {"name": "nginx-server-cert", "secret": {"name": "${NAME}-cert"}}
             ],
             "containers": [
               {
