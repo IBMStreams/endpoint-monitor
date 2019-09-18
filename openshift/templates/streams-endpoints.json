@@ -224,7 +224,7 @@
                 ],
                 "ports": [
                   {
-                    "containerPort": 8080
+                    "containerPort": 8443
                   }
                 ],
                 "readinessProbe": {
@@ -232,7 +232,7 @@
                   "initialDelaySeconds": 3,
                   "httpGet": {
                     "path": "/",
-                    "port": 8080
+                    "port": 8443
                   }
                 },
                 "livenessProbe": {
@@ -240,7 +240,7 @@
                     "initialDelaySeconds": 30,
                     "httpGet": {
                         "path": "/",
-                        "port": 8080
+                        "port": 8443
                     }
                 },
                 "resources": {
@@ -287,8 +287,8 @@
         "ports": [
           {
             "name": "web",
-            "port": 8080,
-            "targetPort": 8080
+            "port": 8443,
+            "targetPort": 8443
           }
         ],
         "selector": {
