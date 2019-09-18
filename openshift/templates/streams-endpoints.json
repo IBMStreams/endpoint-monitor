@@ -216,7 +216,7 @@
                 "name": "streams-nginx",
                 "image": "${NAME}-nginx:latest",
                 "volumeMounts": [
-                     {"name": "nginx-job-configs", "mountPath": "/opt/streams_job_configs"}
+                     {"name": "nginx-job-configs", "mountPath": "/opt/streams_job_configs"},
                      {"name": "${NAME}-nginx-cert", "mountPath": "/var/run/secrets/endpoint-monitor", "readOnly":true}
                 ],
                 "ports": [
@@ -276,7 +276,7 @@
       "metadata": {
         "name": "${NAME}",
         "annotations": {
-          "service.alpha.openshift.io/serving-cert-secret-name": "${NAME}-nginx-cert"
+          "service.alpha.openshift.io/serving-cert-secret-name": "${NAME}-nginx-cert",
           "description": "Exposes IBM Streams application endpoints"
         }
       },
