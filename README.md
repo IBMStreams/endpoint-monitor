@@ -13,36 +13,30 @@ The endpoints from the REST operators are then exposed with fixed URLs through a
 
 # Setup
 
-1. Using an Openshift cluster run `oc new-app` to build and deploy the *endpoint-moinitor* application:
-
-```
-oc new-app \
- -f https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/master/openshift/templates/streams-endpoints.json \
- -p NAME=<application-name> \
- -p STREAMS_INSTANCE_NAME=<IBMStreamsInstance name> \
- -p JOB_GROUP=<job group pattern>
-```
-
-* `NAME` - Name of the openshift/kubernetes service that provides access to the REST endpointd
-* `STREAMS_INSTANCE_NAME` - Name of the Kubernetes object `IBMStreamsInstance` defined in the yaml file when creating the Streams instance.
-* `JOB_GROUP` - Job group pattern. Only jobs with groups that match this pattern will be monitored for REST operators. **Currently only a actual job group can be supplied, not a regular expression.**
-
-The containers in the created pods (once the builds complete) will fail until steps 2,3,4 are completed. There is no additional action required after steps 2,3,4 , Openshift will restart the pod due to the change in configuraiton.
-
-2. Create a kubernetes secret that identifies a Streams instance user that has authorization to view job information for the selected job group(s) through the Streams REST api:
+1. Create a kubernetes secret that identifies a Streams instance user that has authorization to view job information for the selected job group(s) through the Streams REST api:
 
  * `STREAMS_USERNAME` - User identifier for Streams user.
  * `STREAMS_PASSWORD` - Password for Streams user.
  
  <img width="236" alt="image" src="https://user-images.githubusercontent.com/3769612/64719622-7d516e80-d47d-11e9-9cb3-c90bc4406de5.png">
 
-3. Add the secret from step 3. to the environment of container streams-endpoint-monitor in the deployment configuration for *application-name*.
+The name of the secret is used in the next step as the `STREAMS_USER_SECRET` parameter.
 
-After steps 2,3 the configuration for container streams-endpoint-monitor should look like:
+2. Using an Openshift cluster run `oc new-app` to build and deploy the *endpoint-monitor* application:
 
-_image is out of date - the environment variable is now STREAMSX_ENDPOINT_INSTANCE and is set automatically_
+```
+oc new-app \
+ -f https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/master/openshift/templates/streams-endpoints.json \
+ -p NAME=<application-name> \
+ -p STREAMS_INSTANCE_NAME=<IBMStreamsInstance name> \
+ -p JOB_GROUP=<job group pattern> \
+ -p STREAMS_USER_SECRET=<streams user secret>
+```
 
-<img width="1244" alt="image" src="https://user-images.githubusercontent.com/3769612/64719577-5e52dc80-d47d-11e9-97d3-cada3f817525.png">
+* `NAME` - Name of the openshift/kubernetes service that provides access to the REST endpointd
+* `STREAMS_INSTANCE_NAME` - Name of the Kubernetes object `IBMStreamsInstance` defined in the yaml file when creating the Streams instance.
+* `JOB_GROUP` - Job group pattern. Only jobs with groups that match this pattern will be monitored for REST operators. **Currently only a actual job group can be supplied, not a regular expression.**
+* `STREAMS_USER_SECRET` - Name of the secret from step 1, defaults to `streams-user`.
 
 # URL mapping
 
