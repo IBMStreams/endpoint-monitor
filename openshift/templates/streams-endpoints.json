@@ -257,6 +257,9 @@
                 "env": [
                   {"name": "STREAMSX_ENDPOINT_INSTANCE", "value": "${STREAMS_INSTANCE_NAME}"} ,
                   {"name": "STREAMSX_ENDPOINT_JOB_GROUP", "value": "${JOB_GROUP}"}
+                ],
+                "envFrom": [
+                 {"secretRef": {"name": "${STREAMS_USER_SECRET}"}}
                 ]
               }
             ]
@@ -300,6 +303,13 @@
       "displayName": "Streams Instance name",
       "description": "Name of the IBM Streams instance (kind IBMStreamsInstance) to monitor.",
       "required": true
+    },
+    {
+      "name": "STREAMS_USER_SECRET",
+      "displayName": "Streams user secret",
+      "description": "Secret containing STREAMS_USERNAME and STREAMS_PASSWORD for the user to connect to the Streams REST api.",
+      "required": true,
+      "value": "streams-user"
     },
     {
       "name": "JOB_GROUP",
