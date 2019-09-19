@@ -210,31 +210,39 @@
             }
           },
           "spec": {
-            "volumes": [ {"name": "nginx-job-configs", "emptyDir": {}}],
+            "volumes": [
+                {"name": "nginx-job-configs", "emptyDir": {}},
+                {"name": "server-cert", "secret": {"secretName": "${NAME}-cert"}}
+            ],
             "containers": [
               {
                 "name": "streams-nginx",
                 "image": "${NAME}-nginx:latest",
-                "volumeMounts": [ {"name": "nginx-job-configs", "mountPath": "/opt/streams_job_configs"}],
+                "volumeMounts": [
+                     {"name": "nginx-job-configs", "mountPath": "/opt/streams_job_configs"},
+                     {"name": "server-cert", "mountPath": "/var/run/secrets/endpoint-monitor", "readOnly":true}
+                ],
                 "ports": [
                   {
-                    "containerPort": 8080
+                    "containerPort": 8443
                   }
                 ],
                 "readinessProbe": {
                   "timeoutSeconds": 3,
                   "initialDelaySeconds": 3,
                   "httpGet": {
+                    "scheme": "HTTPS",
                     "path": "/",
-                    "port": 8080
+                    "port": 8443
                   }
                 },
                 "livenessProbe": {
                     "timeoutSeconds": 3,
                     "initialDelaySeconds": 30,
                     "httpGet": {
+                        "scheme": "HTTPS",
                         "path": "/",
-                        "port": 8080
+                        "port": 8443
                     }
                 },
                 "resources": {
@@ -273,6 +281,7 @@
       "metadata": {
         "name": "${NAME}",
         "annotations": {
+          "service.alpha.openshift.io/serving-cert-secret-name": "${NAME}-cert",
           "description": "Exposes IBM Streams application endpoints"
         }
       },
@@ -280,8 +289,8 @@
         "ports": [
           {
             "name": "web",
-            "port": 8080,
-            "targetPort": 8080
+            "port": 8443,
+            "targetPort": 8443
           }
         ],
         "selector": {
