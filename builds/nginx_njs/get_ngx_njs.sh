@@ -10,7 +10,7 @@ while [ $RUNING = true ]; do
     sleep 10s
     RUNING=$(docker inspect -f '{{.State.Running}}' endpointContainerKF)
 done
-docker cp endpointContainerKF:/nginx-1.14.0/objs/ngx_http_js_module.so .
+docker cp endpointContainerKF:/nginx-1.14.1/objs/ngx_http_js_module.so .
 docker rm endpointContainerKF > /dev/null 2>&1
 if [ -f ./ngx_http_js_module.so ]; then
     echo 'Container removed, ngx_http_js_module.so file copied to current directory'
