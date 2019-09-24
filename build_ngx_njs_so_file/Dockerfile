@@ -8,7 +8,6 @@ ENV nginxversion="1.14.0-1" \
 
 RUN yum install -y wget openssl sed &&\
     yum -y autoremove &&\
-    yum -y install git &&\
     yum -y install gcc &&\
     yum -y group install "Development Tools" &&\
     yum -y install which &&\

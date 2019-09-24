@@ -1,8 +1,8 @@
 #!/bin/sh
-docker build -t karstenf/endpoint_monitor:latest . > /dev/null 2>&1
 echo 'Building dockerfile'
-docker run --name endpointContainerKF -d karstenf/endpoint_monitor:latest
+docker build -t karstenf/endpoint_monitor:latest . > /dev/null 2>&1
 echo 'Running dockerfile'
+docker run --name endpointContainerKF -d karstenf/endpoint_monitor:latest
 sleep 40s
 RUNING=$(docker inspect -f '{{.State.Running}}' endpointContainerKF)
 while [ $RUNING = true ]; do
