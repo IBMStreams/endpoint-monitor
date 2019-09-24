@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Download the neccessary files
-wget http://nginx.org/download/nginx-1.14.0.tar.gz
+wget https://nginx.org/download/nginx-1.14.0.tar.gz
 wget https://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz
 wget https://www.zlib.net/zlib-1.2.11.tar.gz
 wget https://github.com/nginx/njs/archive/0.3.5.tar.gz
