@@ -7,10 +7,11 @@ def server_url(server):
     return '%s://%s:%s/' % (server.proto, server.ip, server.port)
 
 class FileWriter(object):
-    def __init__(self, location):
+    def __init__(self, location, client_cert):
         self._location = location
         if not os.path.exists(self._location):
             os.mkdir(self._location)
+        self._client_cert = client_cert
         self._pipe_name = os.path.join(location, 'actions')
         
     def _reload(self):
@@ -71,4 +72,11 @@ class FileWriter(object):
         f.write('  proxy_set_header  X-Forwarded-Host $remote_addr;\n')
         #f.write('  proxy_pass %s://streams_job_%s/;\n' % (proto, jobid))
         f.write('  proxy_pass %s;\n' % (server_url(server)))
+
+        if proto == 'https':
+            if self._client_cert:
+                f.write('  proxy_ssl_certificate %s;\n' % self._client_cert[0])
+                f.write('  proxy_ssl_certificate_key %s;\n' % self._client_cert[1])
+     
+
         f.write('}\n')

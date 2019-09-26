@@ -212,7 +212,8 @@
           "spec": {
             "volumes": [
                 {"name": "shared-disk", "emptyDir": {}},
-                {"name": "server-cert", "secret": {"secretName": "${NAME}-cert"}}
+                {"name": "server-cert", "secret": {"secretName": "${NAME}-cert"}},
+                {"name": "streams-certs", "secret": {"secretName": "${NAME}-streams-certs"}}
             ],
             "containers": [
               {
@@ -257,7 +258,8 @@
                 "name": "streams-endpoint-monitor",
                 "image": "${NAME}-endpoint-monitor:latest",
                 "volumeMounts": [
-                  {"name": "shared-disk", "mountPath": "/var/opt/streams-endpoint-monitor"}
+                  {"name": "shared-disk", "mountPath": "/var/opt/streams-endpoint-monitor"},
+                  {"name": "streams-certs", "mountPath": "/var/run/secrets/streams-endpoint-monitor/streams-certs", "readOnly":true, "optional":true}
                 ],
                 "resources": {
                     "limits": {
