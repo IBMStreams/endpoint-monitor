@@ -23,7 +23,7 @@ def _unpack_restop_certs():
     rsa = os.path.join(certs_dir, 'client.rsa')
 
     ossl = '/usr/bin/openssl'
-    args = ['/usr/bin/openssl', 'pkcs12', '-in', cert_file, '--pass', 'file:' + pwd_file]
+    args = ['/usr/bin/openssl', 'pkcs12', '-in', cert_file, '-password', 'file:' + pwd_file]
     subprocess.run(args + ['-clcerts', '-nokeys', '-out', crt], check=True)
     subprocess.run(args + ['-nocerts', '-nodes', '-out', rsa], check=True)
     return crt, rsa
