@@ -15,6 +15,7 @@ def _unpack_restop_certs():
     if not os.path.exists(cert_file):
         return
 
+    pwd_file = os.path.join(SECRETS, 'streams-certs', 'client.pass')
     certs_dir = os.path.join(OPT, 'streams-certs')
     if not os.path.exists(certs_dir):
         os.mkdir(certs_dir)
@@ -22,7 +23,7 @@ def _unpack_restop_certs():
     rsa = os.path.join(certs_dir, 'client.rsa')
 
     ossl = '/usr/bin/openssl'
-    args = ['/usr/bin/openssl', 'pkcs12', '-in', cert_file]
+    args = ['/usr/bin/openssl', 'pkcs12', '-in', cert_file, '--pass', 'file:' + pwd_file]
     subprocess.run(args + ['-clcerts', '-nokeys', '-out', crt], check=True)
     subprocess.run(args + ['-nocerts', '-nodes', '-out', rsa], check=True)
     return crt, rsa
