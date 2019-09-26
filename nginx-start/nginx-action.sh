@@ -1,4 +1,4 @@
-af=/opt/streams_job_configs/actions
+af=/var/opt/streams-endpoint-monitor/job-configs/actions
 echo 'Starting action reader for' ${af}
 (
 while true

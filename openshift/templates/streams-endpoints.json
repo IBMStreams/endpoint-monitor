@@ -211,7 +211,7 @@
           },
           "spec": {
             "volumes": [
-                {"name": "nginx-job-configs", "emptyDir": {}},
+                {"name": "shared-disk", "emptyDir": {}},
                 {"name": "server-cert", "secret": {"secretName": "${NAME}-cert"}}
             ],
             "containers": [
@@ -219,8 +219,8 @@
                 "name": "streams-nginx",
                 "image": "${NAME}-nginx:latest",
                 "volumeMounts": [
-                     {"name": "nginx-job-configs", "mountPath": "/opt/streams_job_configs"},
-                     {"name": "server-cert", "mountPath": "/var/run/secrets/endpoint-monitor", "readOnly":true}
+                     {"name": "shared-disk", "mountPath": "/var/opt/streams-endpoint-monitor"},
+                     {"name": "server-cert", "mountPath": "/var/run/secrets/streams-endpoint-monitor/server-cert", "readOnly":true}
                 ],
                 "ports": [
                   {
@@ -256,7 +256,9 @@
               {
                 "name": "streams-endpoint-monitor",
                 "image": "${NAME}-endpoint-monitor:latest",
-                "volumeMounts": [ {"name": "nginx-job-configs", "mountPath": "/opt/streams_job_configs"}],
+                "volumeMounts": [
+                  {"name": "shared-disk", "mountPath": "/var/opt/streams-endpoint-monitor"},
+                ],
                 "resources": {
                     "limits": {
                         "memory": "${MEMORY_LIMIT}"

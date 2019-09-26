@@ -9,6 +9,8 @@ def server_url(server):
 class FileWriter(object):
     def __init__(self, location):
         self._location = location
+        if not os.path.exists(self._location):
+            os.mkdir(self._location)
         self._pipe_name = os.path.join(location, 'actions')
         
     def _reload(self):
