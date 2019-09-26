@@ -8,7 +8,7 @@ from endpoint_monitor import EndpointMonitor
 import streams_openshift
 
 OPT = '/var/opt/streams-endpoint-monitor'
-SECRETS = '/var/secrets/streams-endpoint-monitor'
+SECRETS = '/var/run/secrets/streams-endpoint-monitor'
 
 def _unpack_restop_certs():
     cert_file = os.path.join(SECRETS, 'streams-certs', 'client.pfx')
