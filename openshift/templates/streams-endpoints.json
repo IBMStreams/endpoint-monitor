@@ -257,7 +257,7 @@
                 "name": "streams-endpoint-monitor",
                 "image": "${NAME}-endpoint-monitor:latest",
                 "volumeMounts": [
-                  {"name": "shared-disk", "mountPath": "/var/opt/streams-endpoint-monitor"},
+                  {"name": "shared-disk", "mountPath": "/var/opt/streams-endpoint-monitor"}
                 ],
                 "resources": {
                     "limits": {
