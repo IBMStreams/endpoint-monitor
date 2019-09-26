@@ -213,7 +213,7 @@
             "volumes": [
                 {"name": "shared-disk", "emptyDir": {}},
                 {"name": "server-cert", "secret": {"secretName": "${NAME}-cert"}},
-                {"name": "streams-certs", "secret": {"secretName": "${NAME}-streams-certs"}}
+                {"name": "streams-certs", "secret": {"secretName": "${NAME}-streams-certs", "optional":true}}
             ],
             "containers": [
               {
