@@ -23,7 +23,7 @@ job_group_pattern = os.environ['STREAMSX_ENDPOINT_JOB_GROUP']
 job_filter = lambda job : job.jobGroup.endswith('/'+job_group_pattern)
 print("Job group pattern:", job_group_pattern)
 
-cfg = FileWriter(location='/opt/streams_job_configs')
+cfg = FileWriter(location='/var/opt/streams-endpoint-monitor/job-configs')
 
 em = EndpointMonitor(endpoint=sws_service, config=cfg, job_filter=job_filter, verify=False)
 em.run()
