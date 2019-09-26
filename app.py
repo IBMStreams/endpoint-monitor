@@ -10,7 +10,11 @@ import streams_openshift
 OPT = '/var/opt/streams-endpoint-monitor'
 SECRETS = '/var/run/secrets/streams-endpoint-monitor'
 
-def _unpack_restop_certs():
+def _convert_client_cert():
+    """
+      Convert the client certificate pfx to crt/rsa required by nginx.
+      If the certificate does not exist then no action is taken.
+    """
     cert_file = os.path.join(SECRETS, 'streams-certs', 'client.pfx')
     if not os.path.exists(cert_file):
         return
@@ -22,11 +26,19 @@ def _unpack_restop_certs():
     crt = os.path.join(certs_dir, 'client.crt')
     rsa = os.path.join(certs_dir, 'client.rsa')
 
-    ossl = '/usr/bin/openssl'
     args = ['/usr/bin/openssl', 'pkcs12', '-in', cert_file, '-password', 'file:' + pwd_file]
     subprocess.run(args + ['-clcerts', '-nokeys', '-out', crt], check=True)
     subprocess.run(args + ['-nocerts', '-nodes', '-out', rsa], check=True)
     return crt, rsa
+
+def _process_streams_certs():
+    """
+    Take the certificate information from the streams-certs to:
+        * convert the client certificate pfx to crt/rsa required by nginx
+    """
+    client_cert = _convert_client_cert()
+
+    return client_cert
 
 info.main()
 
@@ -45,7 +57,7 @@ job_group_pattern = os.environ['STREAMSX_ENDPOINT_JOB_GROUP']
 job_filter = lambda job : job.jobGroup.endswith('/'+job_group_pattern)
 print("Job group pattern:", job_group_pattern)
 
-client_cert = _unpack_restop_certs()
+client_cert = _process_streams_certs()
 
 cfg = FileWriter(location=os.path.join(OPT, 'job-configs'), client_cert=client_cert)
 
