@@ -27,7 +27,12 @@ class FileWriter(object):
   
     def create(self, jobid, config):
         entry = {}
-        entry['location'] = '/streams/job/' + str(jobid) + '/'
+        if config['name'] == config['applicationName'] + '_' + jobid:
+            location = '/streams/jobs/' + str(jobid) + '/'
+        else:
+            location = '/' + config['name'] + '/'
+
+        entry['location'] = location
         entry['servers'] = config['servers']
         config['config_file'] = self._write_file(jobid, [entry])
         self._reload()
