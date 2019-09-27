@@ -27,7 +27,7 @@ class FileWriter(object):
   
     def create(self, jobid, config):
         entry = {}
-        if config['name'] = config['applicationName'] + '_' + jobid:
+        if config['name'] == config['applicationName'] + '_' + jobid:
             location = '/streams/jobs/' + str(jobid) + '/'
         else
             location = config['name'] + '/'
