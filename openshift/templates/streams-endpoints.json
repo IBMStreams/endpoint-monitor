@@ -121,7 +121,7 @@
             "from": {
               "kind": "ImageStreamTag",
               "namespace": "${NAMESPACE}",
-              "name": "nginx:${NGINX_VERSION}"
+              "name": "nginx:1.14"
             }
           }
         },
@@ -336,13 +336,6 @@
       "description": "The OpenShift Namespace where the ImageStream resides.",
       "required": true,
       "value": "openshift"
-    },
-    {
-      "name": "NGINX_VERSION",
-      "displayName": "NGINX Version",
-      "description": "Version of NGINX image to be used (1.12 by default).",
-      "required": true,
-      "value": "1.12"
     },
     {
       "name": "MEMORY_LIMIT",
