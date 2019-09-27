@@ -46,19 +46,30 @@ Current support is limited to:
  * Single web-server per job
      * The web-server can be hosting multiple REST operators that are fused into a single PE
  * Port number should be zero or a non-system port.
- * Currently all jobs are monitored for endpoints, job filtering will be added.
 
 For a web-server in a job its URLs are exposed with prefix path:
 
- * `streams/job/`*jobid*`/`
+ * *jobname*`/` - When a job name was explictly set. Job names should be simple mapping to a single path element.
+ * `streams/jobs/`*jobid*`/` - When a job name was not explicitly set.
+
+The path is against the service *application-name*
  
- (plan is to support job names as the fixed path).
+Example URLs within the cluster for *application-name* of `em` in project `myproject` are:
  
- For example with a web-server in job 7:
+ * `https://em.myproject.svc:8443/transit/ports/info` with a web-server in job named `transit`:
+ * `https://em.myproject.svc:8443/streams/jobs/7/ports/info` with a web-server in job 7:
  
- * `streams/job/7/ports/info`
+
+# Implementation notes
+
+The template uses the nginx and python 3.6 source to image (s2i) setups to define two containers (nginx & python) within a single pod. The two containers share a local volume (`/opt/streams_job_configs`) and communicate through a named pipe on the volume.
+ * nginx 1.12 s2i - https://github.com/sclorg/nginx-container/tree/master/1.12
+ * python 3.6 s2i - tbd
+
+The python container monitors the Streams instance using the REST api through its sws service and as jobs are submitted and canceled it updates each job's reverse proxy configuration in `/opt/streams_job_configs`. Once a job configuration has been written it sends a `reload` action through the named pipe.
+
+ * `https://em.myoproject.svc:8443/streams/jobs/7/ports/info` with a web-server in job 7:
  
- The path is against the service *application-name*.
 
 # Implementation notes
 
