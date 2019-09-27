@@ -30,7 +30,7 @@ class FileWriter(object):
         if config['name'] == config['applicationName'] + '_' + jobid:
             location = '/streams/jobs/' + str(jobid) + '/'
         else:
-            location = config['name'] + '/'
+            location = '/' + config['name'] + '/'
 
         entry['location'] = location
         entry['servers'] = config['servers']
