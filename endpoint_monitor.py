@@ -40,7 +40,7 @@ def _job_new_incarnation(job):
         if op.operatorKind.startswith('com.ibm.streamsx.inet.rest::'):
             if not rest_job:
                 rest_job = {'servers':set(), 'ops':dict(), 'pes':dict()}
-                for k in ['name', 'generationId']:
+                for k in ['name', 'generationId', 'applicationName']:
                     rest_job[k] = getattr(job, k)
                         
             rest_job['ops'][op.name] = {'kind':op.operatorKind}
