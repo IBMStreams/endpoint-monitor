@@ -22,7 +22,18 @@ The endpoints from the REST operators are then exposed with fixed URLs through a
 
 The name of the secret is used in the next step as the `STREAMS_USER_SECRET` parameter.
 
-2. Using an Openshift cluster run `oc new-app` to build and deploy the *endpoint-monitor* application:
+2. If your `openshift` project does not contain the image `nginx:1.14` then add it using.
+
+```
+oc login system:admin
+oc project openshift
+oc tag docker.io/centos/nginx-114-centos7:latest nginx:1.14
+```
+
+If you your image streams are in different namespace to `openshift` then use that as the project and set the `NAMESPACE`
+parameter when invoking `oc new-app`.
+
+3. Using an Openshift cluster run `oc new-app` to build and deploy the *endpoint-monitor* application:
 
 ```
 oc new-app \
