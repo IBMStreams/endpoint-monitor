@@ -6,7 +6,7 @@ ENV nginxversion="1.14.0-1" \
     osversion="7" \
     elversion="7_4"
 
-RUN yum install -y wget openssl sed &&\
+RUN yum install -y wget openssl.devel sed &&\
     yum -y autoremove &&\
     yum -y install gcc &&\
     yum -y group install "Development Tools" &&\
