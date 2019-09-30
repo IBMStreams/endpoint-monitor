@@ -21,5 +21,11 @@ make install
 # Build the ngx_http_js_module.so file
 cd ../nginx-1.14.1/
 make clean
-./configure --with-compat --with-pcre=../pcre-8.43/ --with-zlib=../zlib-1.2.11 --add-dynamic-module=../njs-0.3.5/nginx/
+./configure --with-pcre=../pcre-8.43/ --with-zlib=../zlib-1.2.11 \
+    --add-dynamic-module=../njs-0.3.5/nginx/ \
+    --with-file-aio \
+    --with-http_ssl_module \
+    --with-http_realip_module \
+    --with-http_dav_module \
+    --with-cc-opt='-DNGX_HTTP_HEADERS'
 make modules
