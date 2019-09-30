@@ -41,7 +41,7 @@ def _process_streams_certs():
     return client_cert
 
 def _has_signature_secret():
-    sig_file = os.path.join(SECRETS, 'streams-auth', 'signature.secret')
+    sig_file = os.path.join(SECRETS, 'server-auth', 'signature.secret')
     return os.path.exists(sig_file)
 
 info.main()
