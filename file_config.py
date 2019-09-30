@@ -82,17 +82,17 @@ class FileWriter(object):
             f.write("  set $redirectLocation '/@internal%s;\n" % entry['location'])
             f.write("  js_content checkHTTP;\n" % entry['location'])
         else:
-            _proxy_location(f, proto, server)
+            self._proxy_location(f, proto, server)
         f.write('}\n')
 
         if self._signature:
             f.write('location /@internal%s {\n' % entry['location'])
             f.write('  internal;\n');
-            _proxy_location(f, proto, server)
+            self._proxy_location(f, proto, server)
             f.write('}\n')
 
 
-    def _proxy_location(f, proto, server):
+    def _proxy_location(self, f, proto, server):
 
         f.write('  proxy_set_header Host $host;\n')
         f.write('  proxy_set_header X-Real-IP $remote_addr;\n')
