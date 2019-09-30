@@ -1,11 +1,12 @@
 function readSecret(r) {
-    var toReturn;
+    var key;
     try {
-        toReturn = require('fs').readFileSync('/var/run/secrets/streams-endpoint-monitor/server-auth/signature-secret');
+        key = require('fs').readFileSync('/var/run/secrets/streams-endpoint-monitor/server-auth/signature-secret');
     } catch (e) {
-        toReturn = 'dummy_secret';
+        // If file doesn't exist, set secret to dummy key, and skip signature verification
+        key = 'dummy_secret';
     }
-    return toReturn.toString();
+    return key.toString();
 }
 
 function checkHTTP(r) {
@@ -15,6 +16,7 @@ function checkHTTP(r) {
     // HTTP method we want to do signature check for
     var checkMethods = ['POST', 'PUT', 'PATCH'];
 
+    // If secret key is not a dummy key, do signature check
     if (secret_key !== 'dummy_secret') {
         if (checkMethods.includes(method)) {
             // request is a POST/PUT/PATCH, invoke signature check
