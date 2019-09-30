@@ -4,27 +4,23 @@ function readSecret(r) {
         key = require('fs').readFileSync('/var/run/secrets/streams-endpoint-monitor/server-auth/signature-secret');
     } catch (e) {
         // If file doesn't exist, set secret to dummy key, and skip signature verification
-        key = 'dummy_secret';
+        key = '';
     }
     return key.toString();
 }
 
 function checkHTTP(r) {
-    var secret_key = r.variables.signatureSecret;
     // HTTP method of the request
     var method = r.method;
     // HTTP method we want to do signature check for
     var checkMethods = ['POST', 'PUT', 'PATCH'];
 
-    // If secret key is not a dummy key, do signature check
-    if (secret_key !== 'dummy_secret') {
-        if (checkMethods.includes(method)) {
-            // request is a POST/PUT/PATCH, invoke signature check
-            if (checkSignature(r) == false) {
-                // if not authed, return error page
-                r.return(401, "Not authorized to access this page");
-            };
-        }
+    if (checkMethods.includes(method)) {
+        // request is a POST/PUT/PATCH, invoke signature check
+        if (checkSignature(r) == false) {
+            // if not authed, return error page
+            r.return(401, "Not authorized to access this page");
+        };
     }
     // Request is either a GET or an authorized POST/PUT/PATCH, redirect to internal proxy_pass location
     r.internalRedirect(r.variables.redirectLocation);
