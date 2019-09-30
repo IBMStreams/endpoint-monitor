@@ -213,6 +213,7 @@
             "volumes": [
                 {"name": "shared-disk", "emptyDir": {}},
                 {"name": "server-cert", "secret": {"secretName": "${NAME}-cert"}},
+                {"name": "server-auth", "secret": {"secretName": "${NAME}-authentication", "optional":true}}
                 {"name": "streams-certs", "secret": {"secretName": "${NAME}-streams-certs", "optional":true}}
             ],
             "containers": [
@@ -222,6 +223,7 @@
                 "volumeMounts": [
                      {"name": "shared-disk", "mountPath": "/var/opt/streams-endpoint-monitor"},
                      {"name": "server-cert", "mountPath": "/var/run/secrets/streams-endpoint-monitor/server-cert", "readOnly":true}
+                     {"name": "server-auth", "mountPath": "/var/run/secrets/streams-endpoint-monitor/server-auth", "readOnly":true}
                 ],
                 "ports": [
                   {
@@ -260,6 +262,7 @@
                 "volumeMounts": [
                   {"name": "shared-disk", "mountPath": "/var/opt/streams-endpoint-monitor"},
                   {"name": "streams-certs", "mountPath": "/var/run/secrets/streams-endpoint-monitor/streams-certs", "readOnly":true, "optional":true}
+                  {"name": "server-auth", "mountPath": "/var/run/secrets/streams-endpoint-monitor/server-auth", "readOnly":true}
                 ],
                 "resources": {
                     "limits": {
