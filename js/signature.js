@@ -1,19 +1,28 @@
 function readSecret(r) {
-    return require('fs').readFileSync('/var/run/secrets/streams-endpoint-monitor/server-auth/signature-secret').toString();
+    var toReturn;
+    try {
+        toReturn = require('fs').readFileSync('/var/run/secrets/streams-endpoint-monitor/server-auth/signature-secret');
+    } catch (e) {
+        toReturn = 'dummy_secret';
+    }
+    return toReturn.toString();
 }
 
 function checkHTTP(r) {
+    var secret_key = r.variables.signatureSecret;
     // HTTP method of the request
     var method = r.method;
     // HTTP method we want to do signature check for
     var checkMethods = ['POST', 'PUT', 'PATCH'];
 
-    if (checkMethods.includes(method)) {
-        // request is a POST/PUT/PATCH, invoke signature check
-        if (checkSignature(r) == false) {
-            // if not authed, return error page
-            r.return(401, "Not authorized to access this page");
-        };
+    if (secret_key !== 'dummy_secret') {
+        if (checkMethods.includes(method)) {
+            // request is a POST/PUT/PATCH, invoke signature check
+            if (checkSignature(r) == false) {
+                // if not authed, return error page
+                r.return(401, "Not authorized to access this page");
+            };
+        }
     }
     // Request is either a GET or an authorized POST/PUT/PATCH, redirect to internal proxy_pass location
     r.internalRedirect(r.variables.redirectLocation);
