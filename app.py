@@ -42,7 +42,7 @@ def _process_streams_certs():
 
 def _has_signature_secret():
     sig_file = os.path.join(SECRETS, 'streams-auth', 'signature.secret')
-    return os.path.exists(sig_file):
+    return os.path.exists(sig_file)
 
 info.main()
 
