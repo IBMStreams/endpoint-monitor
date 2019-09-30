@@ -235,7 +235,7 @@
                   "initialDelaySeconds": 3,
                   "httpGet": {
                     "scheme": "HTTPS",
-                    "path": "/",
+                    "path": "/liveness-probe",
                     "port": 8443
                   }
                 },
@@ -244,7 +244,7 @@
                     "initialDelaySeconds": 30,
                     "httpGet": {
                         "scheme": "HTTPS",
-                        "path": "/",
+                        "path": "/liveness-probe",
                         "port": 8443
                     }
                 },
