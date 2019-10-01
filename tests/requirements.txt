@@ -1,0 +1,3 @@
+streamsx>=1.13.8
+streamsx.testing
+streamsx.endpoint
