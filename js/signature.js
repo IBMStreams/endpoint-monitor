@@ -23,7 +23,8 @@ function checkHTTP(r) {
         };
     }
     // Request is either a GET or an authorized POST/PUT/PATCH, redirect to internal proxy_pass location
-    r.internalRedirect(r.variables.redirectLocation);
+    r.internalRedirect('/@internal' + r.variables.request_uri);
+
 }
 
 function checkSignature(r) {
