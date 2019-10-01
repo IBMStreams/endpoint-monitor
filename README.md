@@ -20,7 +20,7 @@ The endpoints from the REST operators are then exposed with fixed URLs through a
  
  <img width="236" alt="image" src="https://user-images.githubusercontent.com/3769612/64719622-7d516e80-d47d-11e9-9cb3-c90bc4406de5.png">
 
-The name of the secret is used in the next step as the `STREAMS_USER_SECRET` parameter.
+The name of the secret is used in step 4 as the `STREAMS_USER_SECRET` parameter.
 
 2. If your `openshift` project does not contain the image `nginx:1.14` then add it using.
 
@@ -33,7 +33,17 @@ oc tag docker.io/centos/nginx-114-centos7:latest nginx:1.14
 If you your image streams are in different namespace to `openshift` then use that as the project and set the `NAMESPACE`
 parameter when invoking `oc new-app`.
 
-3. Using an Openshift cluster run `oc new-app` to build and deploy the *endpoint-monitor* application:
+3. Optional - Create a kubernetes secret that defines authentication for the endpoint-monitor service.
+
+The name of the secret is `<application-name>-authentication` e.g. `em-authentication`.
+
+For signature verification of POST, PUT, PATCH requests create the property `signature-secret` with the value of secret.
+(See #8 for details of signature).
+
+<img width="394" alt="image" src="https://user-images.githubusercontent.com/3769612/65935654-b6229a80-e3ce-11e9-92ff-a13ace0f7cf6.png">
+
+
+4. Using an Openshift cluster run `oc new-app` to build and deploy the *endpoint-monitor* application:
 
 ```
 oc new-app \
