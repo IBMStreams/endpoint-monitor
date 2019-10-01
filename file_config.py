@@ -79,7 +79,7 @@ class FileWriter(object):
         # The external location
         f.write('location %s {\n' % entry['location'])
         if self._signature:
-            f.write("  set $redirectLocation '/@internal%s;\n" % entry['location'])
+            f.write("  set $redirectLocation '/@internal%s';\n" % entry['location'])
             f.write("  js_content checkHTTP;\n")
         else:
             self._proxy_location(f, proto, server)
