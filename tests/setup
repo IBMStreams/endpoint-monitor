@@ -1,0 +1,6 @@
+export STREAMS_BUILD_URL=https://192.168.64.47:32731
+export STREAMS_REST_URL=https://192.168.64.47:32549
+export STREAMS_USERNAME=einstein
+export STREAMS_PASSWORD=password
+
+export ENDPOINT_MONITOR=https://192.168.64.47:30953
