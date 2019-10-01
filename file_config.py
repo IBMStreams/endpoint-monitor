@@ -7,8 +7,9 @@ def server_url(server):
     return '%s://%s:%s/' % (server.proto, server.ip, server.port)
 
 class FileWriter(object):
-    def __init__(self, location, client_cert):
+    def __init__(self, location, client_cert, signature):
         self._location = location
+        self._signature = signature
         if not os.path.exists(self._location):
             os.mkdir(self._location)
         self._client_cert = client_cert
@@ -69,7 +70,30 @@ class FileWriter(object):
         f.write('  proxy_pass https://ajax.googleapis.com/ajax/libs/dojo/1.14.1/;\n')
         f.write('}\n')
 
+        # If we are checking signatures then two locations are
+        # created. The external one that invokes Javascript
+        # to verify the signature and then redirect to the internal one.
+        # The internal is the full proxy one but is only visible within
+        # the server (as it is not protected by any signature authentication).
+
+        # The external location
         f.write('location %s {\n' % entry['location'])
+        if self._signature:
+            f.write("  set $redirectLocation '/@internal%s';\n" % entry['location'])
+            f.write("  js_content checkHTTP;\n")
+        else:
+            self._proxy_location(f, proto, server)
+        f.write('}\n')
+
+        if self._signature:
+            f.write('location /@internal%s {\n' % entry['location'])
+            f.write('  internal;\n');
+            self._proxy_location(f, proto, server)
+            f.write('}\n')
+
+
+    def _proxy_location(self, f, proto, server):
+
         f.write('  proxy_set_header Host $host;\n')
         f.write('  proxy_set_header X-Real-IP $remote_addr;\n')
         f.write('  proxy_set_header X-Forwarded-Proto %s ;\n' % proto)
@@ -82,6 +106,3 @@ class FileWriter(object):
             if self._client_cert:
                 f.write('  proxy_ssl_certificate %s;\n' % self._client_cert[0])
                 f.write('  proxy_ssl_certificate_key %s;\n' % self._client_cert[1])
-     
-
-        f.write('}\n')

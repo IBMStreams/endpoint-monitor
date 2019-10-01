@@ -40,6 +40,11 @@ def _process_streams_certs():
 
     return client_cert
 
+def _has_signature_secret():
+    sig_file = os.path.join(SECRETS, 'server-auth', 'signature-secret')
+    print('Signature secret file', sig_file, os.path.exists(sig_file))
+    return os.path.exists(sig_file)
+
 info.main()
 
 # Name of the IbmStreamsInstance object
@@ -59,7 +64,7 @@ print("Job group pattern:", job_group_pattern)
 
 client_cert = _process_streams_certs()
 
-cfg = FileWriter(location=os.path.join(OPT, 'job-configs'), client_cert=client_cert)
+cfg = FileWriter(location=os.path.join(OPT, 'job-configs'), client_cert=client_cert, signature=_has_signature_secret())
 
 em = EndpointMonitor(endpoint=sws_service, config=cfg, job_filter=job_filter, verify=False)
 em.run()
