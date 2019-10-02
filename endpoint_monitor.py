@@ -32,22 +32,18 @@ def _job_new_incarnation(job):
     for a new job or modified job (change of generation id)
 
     Returns an object with all the required job information
-    and REST endpoints or None if the job does not contain
-    any REST operators.
+    and REST endpoints (if any)
     """
-    rest_job = None
+    job_info = {'servers':set(), 'ops':dict(), 'pes':dict()}
+    for k in ['name', 'generationId', 'applicationName']:
+        job_info[k] = getattr(job, k)
     for op in job.get_operators():
         if op.operatorKind.startswith('com.ibm.streamsx.inet.rest::'):
-            if not rest_job:
-                rest_job = {'servers':set(), 'ops':dict(), 'pes':dict()}
-                for k in ['name', 'generationId', 'applicationName']:
-                    rest_job[k] = getattr(job, k)
-                        
-            rest_job['ops'][op.name] = {'kind':op.operatorKind}
+            job_info['ops'][op.name] = {'kind':op.operatorKind}
             server = _get_server_address(op)
             if server:
-                rest_job['servers'].add(server)
-    return rest_job
+                job_info['servers'].add(server)
+    return job_info
 
 class EndpointMonitor(object):
     def __init__(self, endpoint, config, job_filter, verify=None):
@@ -77,9 +73,18 @@ class EndpointMonitor(object):
             if 'running' != j.status:
                 continue
 
-            rest_job = _job_new_incarnation(j)
-            if rest_job:
-                jobs[j.id] = rest_job
+            job_info = self._jobs.get(j.id)
+            # Check for existing job
+            if job_info:
+                if j.generationId == job_info['generationId']:
+                    # No rest operators, no change in job
+                    if not job_info['servers']:
+                        continue
+
+                    # TODO update operator info only
+                    pass
+
+            jobs[j.id] = job_info = _job_new_incarnation(j)
 
         return jobs
 
@@ -99,26 +104,28 @@ class EndpointMonitor(object):
 
     def _delete_job(self, jobid):
         print("DELETE:", jobid, self._jobs[jobid])
-        self._config.delete(jobid, self._jobs[jobid])
+        if self._jobs['servers']:
+            self._config.delete(jobid, self._jobs[jobid])
         del self._jobs[jobid]
 
     def _update_job(self, jobid, ne):
         print("UPDATE:", jobid, ne)
-        self._config.update(jobid, self._jobs[jobid], ne)
+        if ne['servers']:
+            self._config.update(jobid, self._jobs[jobid], ne)
         self._jobs[jobid] = ne
 
     def _new_job(self, jobid, ne):
         print("NEW:", jobid, ne, bool(ne['servers']))
         if ne['servers']:
             self._config.create(jobid, ne)
-            self._jobs[jobid] = ne
+        self._jobs[jobid] = ne
 
     def run(self):
         self._config.clean()
         while True:
             try:
                  self._update()
-                 time.sleep(30)
+                 time.sleep(5)
             except IOError as e:
                  self._sc = None
                  print("ERROR", e)
