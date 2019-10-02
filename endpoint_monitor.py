@@ -78,7 +78,7 @@ class EndpointMonitor(object):
             if job_info:
                 if j.generationId == job_info['generationId']:
                     # No rest operators, no change in job
-                    if not job_info['servers']:
+                    if not job_info['ops']:
                         jobs[j.id] = job_info
                         continue
 
