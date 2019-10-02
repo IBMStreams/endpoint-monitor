@@ -40,7 +40,10 @@ class TestEmInject(unittest.TestCase):
                  return
             time.sleep(2)
         self.fail("Job not being monitored:" + self._job_url)
-         
+
+    def _check_no_endpoint(self):
+        url = self._job_url + '/ports/info'
+        rc = requests.get(url=url, verify=False)
     
     def _inject(self):
         self._set_job_url()
@@ -66,3 +69,5 @@ class TestEmInject(unittest.TestCase):
         self.tester.tuple_count(s, self.N)
         self.tester.contents(s, [{'seq':i} for i in range(self.N)])
         self.tester.test(self.test_ctxtype, self.test_config)
+
+        self._check_no_endpoint()
