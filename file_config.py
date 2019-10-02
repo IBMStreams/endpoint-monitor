@@ -44,7 +44,9 @@ class FileWriter(object):
         self._reload()
 
     def update(self, jobid, old_config, config):
-        pass
+        # TEMP
+        self.delete(jobid, old_config)
+        self.create(jobid, config)
 
     def _write_file(self, jobid, entries):
         cfn = 'nginx-streams-job-%s.conf' % jobid
