@@ -104,7 +104,7 @@ class EndpointMonitor(object):
 
     def _delete_job(self, jobid):
         print("DELETE:", jobid, self._jobs[jobid])
-        if self._jobs['servers']:
+        if self._jobs[jobid]['servers']:
             self._config.delete(jobid, self._jobs[jobid])
         del self._jobs[jobid]
 
