@@ -84,7 +84,7 @@ class EndpointMonitor(object):
                     # TODO update operator info only
                     pass
 
-            jobs[j.id] = job_info = _job_new_incarnation(j)
+            jobs[j.id] = _job_new_incarnation(j)
 
         return jobs
 
