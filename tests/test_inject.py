@@ -64,4 +64,5 @@ class TestEmInject(unittest.TestCase):
         self.tester = Tester(topo)
         self.tester.local_check = self._inject
         self.tester.tuple_count(s, self.N)
+        self.tester.contents(s, [{'seq':i} for i in range(self.N)])
         self.tester.test(self.test_ctxtype, self.test_config)
