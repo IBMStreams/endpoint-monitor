@@ -13,7 +13,7 @@ The endpoints from the REST operators are then exposed with fixed URLs through a
 
 # Setup
 
-1. Create a kubernetes secret that identifies a Streams instance user that has authorization to view job information for the selected job group(s) through the Streams REST api:
+1. Create a kubernetes generic secret that identifies a Streams instance user that has authorization to view job information for the selected job group(s) through the Streams REST api:
 
  * `STREAMS_USERNAME` - User identifier for Streams user.
  * `STREAMS_PASSWORD` - Password for Streams user.
