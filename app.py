@@ -5,6 +5,7 @@ import streamsx.scripts.info as info
 
 from file_config import FileWriter
 from endpoint_monitor import EndpointMonitor
+import app_config_certs
 import streams_openshift
 
 OPT = '/var/opt/streams-endpoint-monitor'
@@ -67,4 +68,11 @@ client_cert = _process_streams_certs()
 cfg = FileWriter(location=os.path.join(OPT, 'job-configs'), client_cert=client_cert, signature=_has_signature_secret())
 
 em = EndpointMonitor(endpoint=sws_service, config=cfg, job_filter=job_filter, verify=False)
+
+# Create the application configuration
+certs_secret = os.path.join(SECRETS, 'streams-certs')
+if os.path.exists(certs_secret):
+    app_cfg_name = os.environ['STREAMSX_ENDPOINT_NAME'] + '-streams-certs'
+    app_config_certs.create_app_config(em.instance, app_cfg_name, certs_secret)
+
 em.run()

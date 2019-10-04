@@ -270,6 +270,7 @@
                     }
                 },
                 "env": [
+                  {"name": "STREAMSX_ENDPOINT_NAME", "value": "${NAME}"},
                   {"name": "STREAMSX_ENDPOINT_INSTANCE", "value": "${STREAMS_INSTANCE_NAME}"} ,
                   {"name": "STREAMSX_ENDPOINT_JOB_GROUP", "value": "${JOB_GROUP}"}
                 ],
