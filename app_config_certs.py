@@ -9,6 +9,13 @@ import base64
 
 def create_app_config(inst, name, location):
     ac = _get_contents(location)
+    for existing in inst.get_application_configurations(name=name):
+        if existing.name == name:
+            if existing.properties == ac:
+                return
+            existing.update(properties=ac)
+            return
+        
     inst.create_application_configuration(name, ac, 'Endpoint-monitor created Jetty server certificates')
 
 def _get_contents(location):
