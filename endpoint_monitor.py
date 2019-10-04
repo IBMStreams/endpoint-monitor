@@ -5,14 +5,14 @@ import collections
 import time
 import os
 import streamsx.rest as sxr
-import streamsx.rest_primitives
+import streamsx.rest_primitives as srp
 
 Server = collections.namedtuple('Server', ['proto', 'ip', 'port', 'oid'])
 
 def _get_server_address(op):
     pe = op.get_pe()
     # No get_resource on PE
-    pe_resource = streamsx.rest_primitives.Resource(pe.rest_client.make_request(pe.resource), pe.rest_client)
+    pe_resource = srp.Resource(pe.rest_client.make_request(pe.resource), pe.rest_client)
     ip = pe_resource.ipAddress
     port = None
     https = None
@@ -48,19 +48,16 @@ def _job_new_incarnation(job):
 class EndpointMonitor(object):
     def __init__(self, endpoint, config, job_filter, verify=None):
         self._jobs = {}
-        self._url = endpoint + '/streams/rest/resources'
+        self._endpoint = endpoint
         self._config = config
         self._job_filter = job_filter
         self._verify = verify
-        self._sc = None
+        self._inst = None
 
     @property
     def instance(self):
-        if self._sc is None:
-            self._sc = sxr.StreamsConnection(os.environ['STREAMS_USERNAME'], os.environ['STREAMS_PASSWORD'], resource_url=self._url)
-            if self._verify is not None:
-                self._sc.session.verify = self._verify
-            self._ins = self._sc.get_instances()[0]
+        if self._inst is None:
+            self._inst = srp.Instance.of_endpoint(endpoint=self._endpoint, verify=self._verify)
         return self._ins
 
     def _survey_jobs(self):
@@ -128,7 +125,7 @@ class EndpointMonitor(object):
                  self._update()
                  time.sleep(5)
             except IOError as e:
-                 self._sc = None
+                 self._inst = None
                  print("ERROR", e)
                  time.sleep(1)
 

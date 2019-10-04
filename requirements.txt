@@ -1,1 +1,1 @@
-streamsx>=1.13.8
+streamsx>=1.13.11
