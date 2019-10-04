@@ -9,7 +9,7 @@ import base64
 
 def create_app_config(inst, name, location):
     ac = _get_contents(location)
-    instance.create_application_configuration(name, ac, 'Endpoint-monitor created Jetty server certificates')
+    inst.create_application_configuration(name, ac, 'Endpoint-monitor created Jetty server certificates')
 
 def _get_contents(location):
 
