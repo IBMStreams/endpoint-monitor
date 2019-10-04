@@ -58,7 +58,7 @@ class EndpointMonitor(object):
     def instance(self):
         if self._inst is None:
             self._inst = srp.Instance.of_endpoint(endpoint=self._endpoint, verify=self._verify)
-        return self._ins
+        return self._inst
 
     def _survey_jobs(self):
         """ Detect all jobs with REST operators.
