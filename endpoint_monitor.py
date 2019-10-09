@@ -21,7 +21,7 @@ def _get_server_address(op):
             port = m.value
         elif m.name == 'https':
             https = m.value
-    
+
     if ip and port:
         proto = 'https' if https else 'http'
         return Server(proto, ip, port, op.name)
@@ -34,16 +34,19 @@ def _job_new_incarnation(job):
     Returns an object with all the required job information
     and REST endpoints (if any)
     """
-    job_info = {'servers':set(), 'ops':dict(), 'pes':dict()}
-    for k in ['name', 'generationId', 'applicationName']:
-        job_info[k] = getattr(job, k)
+    name = getattr(job, 'name')
+    generationId = getattr(job, 'generationId')
+    applicationName = getattr(job, 'applicationName')
+    ops = {}
+    servers = set()
     for op in job.get_operators():
         if op.operatorKind.startswith('com.ibm.streamsx.inet.rest::'):
-            job_info['ops'][op.name] = {'kind':op.operatorKind}
+            ops[op.name] = {'kind':op.operatorKind}
             server = _get_server_address(op)
             if server:
-                job_info['servers'].add(server)
-    return job_info
+                servers.add(server)
+
+    return _Localjob(name, generationId, applicationName, servers, ops)
 
 class EndpointMonitor(object):
     def __init__(self, endpoint, config, job_filter, verify=None):
@@ -61,27 +64,32 @@ class EndpointMonitor(object):
         return self._inst
 
     def _survey_jobs(self):
-        """ Detect all jobs with REST operators.
+        """ Detect and return all jobs with REST operators.
         """
         jobs = {}
         for j in self.instance.get_jobs():
+            # Check if job j is one of the jobs we want to look at
             if not self._job_filter(j):
                 continue
+            # Check if job j is running, if not, maybe its either spinning up or winding down?
             if 'running' != j.status:
                 continue
 
             job_info = self._jobs.get(j.id)
             # Check for existing job
             if job_info:
-                if j.generationId == job_info['generationId']:
-                    # No rest operators, no change in job
-                    if not job_info['ops']:
+                # Check if hash of existing job j is the same as before
+                if j.generationId == job_info.generationId:
+
+                    if not job_info.ops:
+                        # Same job, no rest operators, thus we don't care about it
+                        # No rest operators, no change in job
                         jobs[j.id] = job_info
                         continue
 
                     # TODO update operator info only
                     pass
-
+            # New job, or job has changed (new generationId) - maybe now has a rest operator?
             jobs[j.id] = _job_new_incarnation(j)
 
         return jobs
@@ -92,31 +100,36 @@ class EndpointMonitor(object):
         existing_jobs = list(self._jobs.keys())
         print("Existing jobs", existing_jobs)
         for jobid in existing_jobs:
+            # Check if existing job is still running
             ne = current_jobs.pop(jobid, None)
             if ne is None:
                 self._delete_job(jobid)
-            elif ne['servers'] != self._jobs[jobid]['servers']:
+            # Job still running
+            # Check if job's servers have changed, if so update nginx config
+            elif ne.servers != self._jobs[jobid].servers:
                 self._update_job(jobid, ne)
         for jobid in current_jobs:
             self._new_job(jobid, current_jobs[jobid])
 
     def _delete_job(self, jobid):
         print("DELETE:", jobid, self._jobs[jobid])
-        if self._jobs[jobid]['servers']:
+        if self._jobs[jobid].servers:
             self._config.delete(jobid, self._jobs[jobid])
         del self._jobs[jobid]
 
     def _update_job(self, jobid, ne):
         print("UPDATE:", jobid, ne)
-        if ne['servers']:
+        if ne.servers:
             self._config.update(jobid, self._jobs[jobid], ne)
         self._jobs[jobid] = ne
 
+    # ne is the jobid's job_info
     def _new_job(self, jobid, ne):
-        print("NEW:", jobid, ne, bool(ne['servers']))
-        if ne['servers']:
+        print("NEW:", jobid, ne, bool(ne.servers))
+        if ne.servers:
             self._config.create(jobid, ne)
         self._jobs[jobid] = ne
+
 
     def run(self):
         self._config.clean()
@@ -129,3 +142,11 @@ class EndpointMonitor(object):
                  print("ERROR", e)
                  time.sleep(1)
 
+class _Localjob:
+    def __init__(self, name, generationId, applicationName, servers=set(), ops={}, pes={}):
+        self.name = name
+        self.generationId = generationId
+        self.applicationName = applicationName
+        self.servers = servers
+        self.ops = ops
+        self.pes = pes
