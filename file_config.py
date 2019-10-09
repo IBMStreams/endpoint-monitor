@@ -39,7 +39,7 @@ class FileWriter(object):
         self._reload()
 
     def delete(self, jobid, config):
-        if 'config_file' in config:
+        if hasattr(config, 'config_file'):
             os.remove(config.config_file)
         self._reload()
 
