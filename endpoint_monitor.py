@@ -150,3 +150,6 @@ class _Localjob:
         self.servers = servers
         self.ops = ops
         self.pes = pes
+
+    def __str__(self):
+        return "servers=%s, ops=%s, pes=%s" % (self.servers, self.ops, self.pes)
