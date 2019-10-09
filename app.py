@@ -71,7 +71,7 @@ em = EndpointMonitor(endpoint=sws_service, config=cfg, job_filter=job_filter, ve
 
 # Create the application configuration
 certs_secret = os.path.join(SECRETS, 'streams-certs')
-server_pass = os.path.join(SECRETS, 'streams-certs/server.pass')
+server_pass = os.path.join(certs_secret, 'server.pass')
 if os.path.exists(server_pass):
     app_cfg_name = os.environ['STREAMSX_ENDPOINT_NAME'] + '-streams-certs'
     app_config_certs.create_app_config(em.instance, app_cfg_name, certs_secret)
