@@ -38,6 +38,7 @@ def _job_new_incarnation(job):
     generationId = getattr(job, 'generationId')
     applicationName = getattr(job, 'applicationName')
     ops = {}
+    pes = {}
     servers = set()
     for op in job.get_operators():
         if op.operatorKind.startswith('com.ibm.streamsx.inet.rest::'):
@@ -45,9 +46,9 @@ def _job_new_incarnation(job):
             pe, server = _get_server_address(op)
             if server:
                 servers.add(server)
-                ops[pe] = pe.launchCount
+                pes[pe.id] = pe.launchCount
 
-    return _Localjob(name, generationId, applicationName, servers, ops)
+    return _Localjob(name, generationId, applicationName, servers, ops, pes)
 
 class EndpointMonitor(object):
     def __init__(self, endpoint, config, job_filter, verify=None):
