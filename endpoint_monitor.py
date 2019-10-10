@@ -24,7 +24,7 @@ def _get_server_address(op):
 
     if ip and port:
         proto = 'https' if https else 'http'
-        return Server(proto, ip, port, op.name)
+        return pe, Server(proto, ip, port, op.name)
 
 
 def _job_new_incarnation(job):
@@ -42,9 +42,10 @@ def _job_new_incarnation(job):
     for op in job.get_operators():
         if op.operatorKind.startswith('com.ibm.streamsx.inet.rest::'):
             ops[op.name] = {'kind':op.operatorKind}
-            server = _get_server_address(op)
+            pe, server = _get_server_address(op)
             if server:
                 servers.add(server)
+                ops[pe] = pe.launchCount
 
     return _Localjob(name, generationId, applicationName, servers, ops)
 
