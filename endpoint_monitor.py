@@ -100,13 +100,12 @@ class EndpointMonitor(object):
                 # Check if hash of existing job j is the same as before
                 if j.generationId == job_info.generationId:
                     # Same job, same rest operators, same PEs
-                    print("SAME GENERATIONID")
 
                     if not job_info.ops:
                         # no rest operators, thus we don't care about it
                         jobs[j.id] = job_info
                         continue
-                    
+
                     # has rest operators, check if pe launchCounts are the same,
                     # if same -> Get all ops in that PE, (A) check if any of those ops have an existing server, if not PE is just starting up
                     # if not  -> Check if PE's server is back up, if yes, add it and update PE launchCount, then remove old invalid servers
@@ -118,9 +117,9 @@ class EndpointMonitor(object):
                     job_operators = j.get_operators()
 
                     for pe in j.get_pes():
-                        if job_info.pes[pe.id] == pe.launchCount:
+                        ops = job_info.ops_in_pe[pe.id]
+                        if pes[pe.id] == pe.launchCount:
                             print("SAME LAUNCHCOUNT")
-                            ops = job_info.ops_in_pe[pe.id]
                             if not _check_if_server_in_ops(job_info, ops):
                                 # PE launchCount same, and no servers in this PE, thus server just starting up, check if it is up and running
                                 for op in _get_operator_objects(job_operators, ops):
@@ -134,7 +133,6 @@ class EndpointMonitor(object):
                             print("DIFFERENT LAUNCHCOUNT")
                             # PE launchCount different, thus PE restarted, get all ops in this PE, and if a new server is up, remove old ones and update config
                             # Get all the operators whose PE's launchCounts have changed
-                            ops = job_info.ops_in_pe[pe.id]
                             for op in _get_operator_objects(job_operators, ops):
                                 new_server = _get_server_address(op)
                                 if new_server:
@@ -152,7 +150,7 @@ class EndpointMonitor(object):
                         new_servers = valid_servers.union(servers_to_add)
 
                         jobs[j.id] = _Localjob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, ops, pes)
-
+                    continue
 
             # New job, or job has changed (new generationId) - maybe now has a rest operator?
             jobs[j.id] = _job_new_incarnation(j)
