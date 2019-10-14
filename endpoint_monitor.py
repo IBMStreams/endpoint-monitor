@@ -111,7 +111,7 @@ class EndpointMonitor(object):
                     ops_changed = []
 
                     for pe in j.get_pes():
-                        if job_info.pes[pe.id] == pe.launchCounts:
+                        if job_info.pes[pe.id] == pe.launchCount:
                             ops = job_info.ops_in_pe[pe.id]
                             if not _check_if_server_in_ops(job_info, ops):
                                 # PE launchCount same, and no servers in this PE, thus server just starting up, check if it is up and running
@@ -131,7 +131,7 @@ class EndpointMonitor(object):
                                 if new_server:
                                     # New server is up and running, add it, update PE launchCount
                                     servers_to_add.add(new_server)
-                                    pes[pe.id] = pe.launchCounts
+                                    pes[pe.id] = pe.launchCount
                                     ops_changed.extend(ops)
                                     # Assuming 1 server / PE (even if more than 1 rest operator in a PE), then we break out
                                     break
