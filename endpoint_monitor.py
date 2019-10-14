@@ -56,6 +56,13 @@ def _job_new_incarnation(job):
 
     return _Localjob(name, generationId, applicationName, servers, ops, pes, ops_in_pe)
 
+
+def _check_if_server_in_ops(job_info, ops):
+    servers = [server for server in job_info.servers if server.oid in ops]
+    if servers:
+        return True
+    return False
+
 class EndpointMonitor(object):
     def __init__(self, endpoint, config, job_filter, verify=None):
         self._jobs = {}
@@ -70,13 +77,6 @@ class EndpointMonitor(object):
         if self._inst is None:
             self._inst = srp.Instance.of_endpoint(endpoint=self._endpoint, verify=self._verify)
         return self._inst
-
-    def _check_if_server_in_ops(self, job_info, ops):
-        servers = [server for server in job_info.servers if server.oid in ops]
-        if servers:
-            return True
-        return False
-
 
     def _survey_jobs(self):
         """ Detect and return all jobs with REST operators.
