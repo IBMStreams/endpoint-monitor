@@ -123,18 +123,18 @@ class EndpointMonitor(object):
                                         # Assuming 1 server / PE (even if more than 1 rest operator in a PE), then we break out
                                         break
                         else:
-                            # PE launchCount different, thus PE restarted, get all ops and if a new server is up, remove old ones and update config
+                            # PE launchCount different, thus PE restarted, get all ops in this PE, and if a new server is up, remove old ones and update config
                             # Get all the operators whose PE's launchCounts have changed
                             ops = job_info.ops_in_pe[pe.id]
                             for op in ops:
                                 new_server = _get_server_address(op)
-                                    if new_server:
-                                        # New server is up and running, add it, update PE launchCount
-                                        servers_to_add.add(new_server)
-                                        pes[pe.id] = pe.launchCounts
-                                        ops_changed.extend(ops)
-                                        # Assuming 1 server / PE (even if more than 1 rest operator in a PE), then we break out
-                                        break
+                                if new_server:
+                                    # New server is up and running, add it, update PE launchCount
+                                    servers_to_add.add(new_server)
+                                    pes[pe.id] = pe.launchCounts
+                                    ops_changed.extend(ops)
+                                    # Assuming 1 server / PE (even if more than 1 rest operator in a PE), then we break out
+                                    break
                     # After checking all PE's, if any new servers, remove old invalid ones and update job's servers
                     if servers_to_add:
                         # Remove the servers, where the operators PE's launchCounts have changed
