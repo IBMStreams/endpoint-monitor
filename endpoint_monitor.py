@@ -54,7 +54,7 @@ def _job_new_incarnation(job):
             else:
                 ops_in_pe[pe.id] = [op.name]
 
-    return _Localjob(name, generationId, applicationName, servers, ops, pes, servers_in_pe)
+    return _Localjob(name, generationId, applicationName, servers, ops, pes, ops_in_pe)
 
 class EndpointMonitor(object):
     def __init__(self, endpoint, config, job_filter, verify=None):
