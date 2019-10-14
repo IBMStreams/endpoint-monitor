@@ -63,6 +63,10 @@ def _check_if_server_in_ops(job_info, ops):
         return True
     return False
 
+def _get_operator_objects(job_operators, ops):
+    return [x for x in job_operators if x.name in ops]
+
+
 class EndpointMonitor(object):
     def __init__(self, endpoint, config, job_filter, verify=None):
         self._jobs = {}
@@ -110,12 +114,14 @@ class EndpointMonitor(object):
                     pes = job_info.pes
                     ops_changed = []
 
+                    job_operators = j.get_operators()
+
                     for pe in j.get_pes():
                         if job_info.pes[pe.id] == pe.launchCount:
                             ops = job_info.ops_in_pe[pe.id]
                             if not _check_if_server_in_ops(job_info, ops):
                                 # PE launchCount same, and no servers in this PE, thus server just starting up, check if it is up and running
-                                for op in ops:
+                                for op in _get_operator_objects(job_operators, ops):
                                     new_server = _get_server_address(op)
                                     if new_server:
                                         # New server is up and running, add it
@@ -126,7 +132,7 @@ class EndpointMonitor(object):
                             # PE launchCount different, thus PE restarted, get all ops in this PE, and if a new server is up, remove old ones and update config
                             # Get all the operators whose PE's launchCounts have changed
                             ops = job_info.ops_in_pe[pe.id]
-                            for op in ops:
+                            for op in _get_operator_objects(job_operators, ops):
                                 new_server = _get_server_address(op)
                                 if new_server:
                                     # New server is up and running, add it, update PE launchCount
@@ -206,7 +212,7 @@ class _Localjob:
         self.servers = servers
         self.ops = ops
         self.pes = pes
-        self.ops_in_pe = ops_in_pe
+        self.ops_in_pe = ops_in_pe # Dictionary mapping PE.id to list of operator names that given PE contains
 
     def __str__(self):
         return "servers=%s, ops=%s, pes=%s" % (self.servers, self.ops, self.pes)
