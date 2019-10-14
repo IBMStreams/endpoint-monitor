@@ -144,7 +144,7 @@ class EndpointMonitor(object):
                     # After checking all PE's, if any new servers, remove old invalid ones and update job's servers
                     if servers_to_add:
                         # Remove the servers, where the operators PE's launchCounts have changed
-                        servers_to_remove = [x for x in job_info.servers if x.oid in ops_changed]
+                        servers_to_remove = set([x for x in job_info.servers if x.oid in ops_changed])
                         valid_servers = job_info.servers - servers_to_remove
                         new_servers = valid_servers.union(servers_to_add)
 
