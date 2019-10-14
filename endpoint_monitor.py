@@ -109,11 +109,9 @@ class EndpointMonitor(object):
                     # has rest operators, check if pe launchCounts are the same,
                     # if same -> Get all ops in that PE, (A) check if any of those ops have an existing server, if not PE is just starting up
                     # if not  -> Check if PE's server is back up, if yes, add it and update PE launchCount, then remove old invalid servers
-                    # TODO update operator info only
                     servers_to_add = set()
                     pes = job_info.pes
                     ops_changed = []
-
                     job_operators = j.get_operators()
 
                     for pe in j.get_pes():
