@@ -100,6 +100,7 @@ class EndpointMonitor(object):
                 # Check if hash of existing job j is the same as before
                 if j.generationId == job_info.generationId:
                     # Same job, same rest operators, same PEs
+                    print("SAME GENERATIONID")
 
                     if not job_info.ops:
                         # no rest operators, thus we don't care about it
@@ -118,6 +119,7 @@ class EndpointMonitor(object):
 
                     for pe in j.get_pes():
                         if job_info.pes[pe.id] == pe.launchCount:
+                            print("SAME LAUNCHCOUNT")
                             ops = job_info.ops_in_pe[pe.id]
                             if not _check_if_server_in_ops(job_info, ops):
                                 # PE launchCount same, and no servers in this PE, thus server just starting up, check if it is up and running
@@ -129,6 +131,7 @@ class EndpointMonitor(object):
                                         # Assuming 1 server / PE (even if more than 1 rest operator in a PE), then we break out
                                         break
                         else:
+                            print("DIFFERENT LAUNCHCOUNT")
                             # PE launchCount different, thus PE restarted, get all ops in this PE, and if a new server is up, remove old ones and update config
                             # Get all the operators whose PE's launchCounts have changed
                             ops = job_info.ops_in_pe[pe.id]
