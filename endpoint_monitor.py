@@ -49,7 +49,7 @@ def _job_new_incarnation(job):
                 servers.add(server)
             pes[pe.id] = pe.launchCount
             # Map the operator to the pe that contains it
-            if ops_in_pe[pe.id]:
+            if pe.id in ops_in_pe:
                 ops_in_pe[pe.id].append(op.name)
             else:
                 ops_in_pe[pe.id] = [op.name]
