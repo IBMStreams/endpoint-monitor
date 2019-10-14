@@ -24,8 +24,7 @@ def _get_server_address(op):
 
     if ip and port:
         proto = 'https' if https else 'http'
-        return pe, Server(proto, ip, port, op.name)
-    return pe, None
+        return Server(proto, ip, port, op.name)
 
 def _job_new_incarnation(job):
     """Obtain the full server information for a job
@@ -39,16 +38,23 @@ def _job_new_incarnation(job):
     applicationName = getattr(job, 'applicationName')
     ops = {}
     pes = {}
+    ops_in_pe = {}
     servers = set()
     for op in job.get_operators():
         if op.operatorKind.startswith('com.ibm.streamsx.inet.rest::'):
             ops[op.name] = {'kind':op.operatorKind}
-            pe, server = _get_server_address(op)
+            server = _get_server_address(op)
+            pe = op.get_pe()
             if server:
                 servers.add(server)
             pes[pe.id] = pe.launchCount
+            # Map the operator to the pe that contains it
+            if ops_in_pe[pe.id]:
+                ops_in_pe[pe.id].append(op.name)
+            else:
+                ops_in_pe[pe.id] = [op.name]
 
-    return _Localjob(name, generationId, applicationName, servers, ops, pes)
+    return _Localjob(name, generationId, applicationName, servers, ops, pes, servers_in_pe)
 
 class EndpointMonitor(object):
     def __init__(self, endpoint, config, job_filter, verify=None):
@@ -64,6 +70,13 @@ class EndpointMonitor(object):
         if self._inst is None:
             self._inst = srp.Instance.of_endpoint(endpoint=self._endpoint, verify=self._verify)
         return self._inst
+
+    def check_if_server_in_ops(self, job_info, ops):
+        servers = [server for server in job_info.servers if server.oid in ops]
+        if servers:
+            return True
+        return False
+
 
     def _survey_jobs(self):
         """ Detect and return all jobs with REST operators.
@@ -82,15 +95,56 @@ class EndpointMonitor(object):
             if job_info:
                 # Check if hash of existing job j is the same as before
                 if j.generationId == job_info.generationId:
+                    # Same job, same rest operators, same PEs
 
                     if not job_info.ops:
-                        # Same job, no rest operators, thus we don't care about it
-                        # No rest operators, no change in job
+                        # no rest operators, thus we don't care about it
                         jobs[j.id] = job_info
                         continue
-
+                    
+                    # has rest operators, check if pe launchCounts are the same,
+                    # if same -> Get all ops in that PE, (A) check if any of those ops have an existing server, if not PE is just starting up
+                    # if not  -> Remove old invalid servers, then need to check if PE's server is back up, if yes, add it and update PE launchCount, if not, do nothing
                     # TODO update operator info only
-                    pass
+                    servers_to_add = set()
+                    pes = job_info.pes
+                    ops_changed = []
+
+                    for pe in j.get_pes():
+                        if job_info.pes[pe.id] == pe.launchCounts:
+                            ops = job_info.ops_in_pe[pe.id]
+                            if not check_if_server_in_ops(ops):
+                                # PE launchCount same, and no servers in this PE, thus server just starting up, check if it is up and running
+                                for op in ops:
+                                    new_server = _get_server_address(op)
+                                    if new_server:
+                                        # New server is up and running, add it
+                                        servers_to_add.add(new_server)
+                                        # Assuming 1 server / PE (even if more than 1 rest operator in a PE), then we break out
+                                        break
+                        else:
+                            # PE launchCount different, thus PE restarted, get all ops and if a new server is up, remove old ones and update config
+                            # Get all the operators whose PE's launchCounts have changed
+                            ops = job_info.ops_in_pe[pe.id]
+                            for op in ops:
+                                new_server = _get_server_address(op)
+                                    if new_server:
+                                        # New server is up and running, add it, update PE launchCount
+                                        servers_to_add.add(new_server)
+                                        pes[pe.id] = pe.launchCounts
+                                        ops_changed.extend(ops)
+                                        # Assuming 1 server / PE (even if more than 1 rest operator in a PE), then we break out
+                                        break
+                    # After checking all PE's, if any new servers, remove old invalid ones and update job's servers
+                    if servers_to_add:
+                        # Remove the servers, where the operators PE's launchCounts have changed
+                        servers_to_remove = [x for x in job_info.servers if x.oid in ops_changed]
+                        valid_servers = job_info.servers - servers_to_remove
+                        new_servers = valid_servers.union(servers_to_add)
+
+                        jobs[j.id] = _Localjob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, ops, pes)
+
+
             # New job, or job has changed (new generationId) - maybe now has a rest operator?
             jobs[j.id] = _job_new_incarnation(j)
 
@@ -145,13 +199,14 @@ class EndpointMonitor(object):
                  time.sleep(1)
 
 class _Localjob:
-    def __init__(self, name, generationId, applicationName, servers=set(), ops={}, pes={}):
+    def __init__(self, name, generationId, applicationName, servers=set(), ops={}, pes={}, ops_in_pe={}):
         self.name = name
         self.generationId = generationId
         self.applicationName = applicationName
         self.servers = servers
         self.ops = ops
         self.pes = pes
+        self.ops_in_pe = ops_in_pe
 
     def __str__(self):
         return "servers=%s, ops=%s, pes=%s" % (self.servers, self.ops, self.pes)
