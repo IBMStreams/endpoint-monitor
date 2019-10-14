@@ -71,7 +71,7 @@ class EndpointMonitor(object):
             self._inst = srp.Instance.of_endpoint(endpoint=self._endpoint, verify=self._verify)
         return self._inst
 
-    def check_if_server_in_ops(self, job_info, ops):
+    def _check_if_server_in_ops(self, job_info, ops):
         servers = [server for server in job_info.servers if server.oid in ops]
         if servers:
             return True
@@ -104,7 +104,7 @@ class EndpointMonitor(object):
                     
                     # has rest operators, check if pe launchCounts are the same,
                     # if same -> Get all ops in that PE, (A) check if any of those ops have an existing server, if not PE is just starting up
-                    # if not  -> Remove old invalid servers, then need to check if PE's server is back up, if yes, add it and update PE launchCount, if not, do nothing
+                    # if not  -> Check if PE's server is back up, if yes, add it and update PE launchCount, then remove old invalid servers
                     # TODO update operator info only
                     servers_to_add = set()
                     pes = job_info.pes
@@ -113,7 +113,7 @@ class EndpointMonitor(object):
                     for pe in j.get_pes():
                         if job_info.pes[pe.id] == pe.launchCounts:
                             ops = job_info.ops_in_pe[pe.id]
-                            if not check_if_server_in_ops(ops):
+                            if not _check_if_server_in_ops(job_info, ops):
                                 # PE launchCount same, and no servers in this PE, thus server just starting up, check if it is up and running
                                 for op in ops:
                                     new_server = _get_server_address(op)
