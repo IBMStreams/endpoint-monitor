@@ -169,9 +169,10 @@ class EndpointMonitor(object):
         print("Existing jobs", existing_jobs)
         for jobid in existing_jobs:
             # Check if existing job is still running
+            print(jobid)
             ne = current_jobs.pop(jobid, None)
+            print(ne)
             if ne is None:
-
                 self._delete_job(jobid)
             # Job still running
             # Check if job's servers have changed, if so update nginx config
