@@ -161,7 +161,6 @@ class EndpointMonitor(object):
             print("CREATING NEW JOB")
             # New job, or job has changed (new generationId) - maybe now has a rest operator?
             jobs[j.id] = _job_new_incarnation(j)
-        print(jobs)
         return jobs
 
     def _update(self):
@@ -171,9 +170,7 @@ class EndpointMonitor(object):
         print("Existing jobs", existing_jobs)
         for jobid in existing_jobs:
             # Check if existing job is still running
-            print(jobid)
             ne = current_jobs.pop(jobid, None)
-            print(ne)
             if ne is None:
                 self._delete_job(jobid)
             # Job still running
