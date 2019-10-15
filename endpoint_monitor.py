@@ -154,7 +154,7 @@ class EndpointMonitor(object):
                         # Add the new servers
                         new_servers = valid_servers.union(servers_to_add)
                         # Update the job w/ the new info
-                        jobs[j.id] = _Localjob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, ops, pes, job_info.ops_in_pe)
+                        jobs[j.id] = _Localjob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, job_info.ops, job_info.pes, job_info.ops_in_pe)
                     continue
             print("CREATING NEW JOB")
             # New job, or job has changed (new generationId) - maybe now has a rest operator?
@@ -171,6 +171,7 @@ class EndpointMonitor(object):
             # Check if existing job is still running
             ne = current_jobs.pop(jobid, None)
             if ne is None:
+
                 self._delete_job(jobid)
             # Job still running
             # Check if job's servers have changed, if so update nginx config
