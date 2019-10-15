@@ -159,7 +159,7 @@ class EndpointMonitor(object):
             print("CREATING NEW JOB")
             # New job, or job has changed (new generationId) - maybe now has a rest operator?
             jobs[j.id] = _job_new_incarnation(j)
-
+        print(jobs)
         return jobs
 
     def _update(self):
