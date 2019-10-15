@@ -64,6 +64,7 @@ def _check_if_server_in_ops(job_info, ops):
     return False
 
 def _get_operator_objects(job_operators, ops):
+    # Get the operator objects where the operator names are in ops
     return [x for x in job_operators if x.name in ops]
 
 
@@ -106,9 +107,11 @@ class EndpointMonitor(object):
                         jobs[j.id] = job_info
                         continue
 
-                    # has rest operators, check if pe launchCounts are the same,
-                    # if same -> Get all ops in that PE, (A) check if any of those ops have an existing server, if not PE is just starting up
-                    # if not  -> Check if PE's server is back up, if yes, add it and update PE launchCount, then remove old invalid servers
+                    # has rest operators, for each pe, check if pe launchCounts are the same
+                    # if same -> Get all ops in that PE, check if any of those ops have an existing server (assumes if more than 1 rest op in PE, they all share 1 server object), if not PE is just starting up
+                    # if not  -> Check if PE's server is back up
+                    #   if yes, add it and update PE launchCount, then remove old invalid servers
+                    #   if no, don't do anything (need to wait for server to come back up)
                     servers_to_add = set()
                     pes = job_info.pes
                     ops_changed = []
@@ -118,6 +121,7 @@ class EndpointMonitor(object):
                         ops = job_info.ops_in_pe[pe.id]
                         if pes[pe.id] == pe.launchCount:
                             print("SAME LAUNCHCOUNT")
+                            # Check if this PE has any operators w/ a server
                             if not _check_if_server_in_ops(job_info, ops):
                                 # PE launchCount same, and no servers in this PE, thus server just starting up, check if it is up and running
                                 for op in _get_operator_objects(job_operators, ops):
@@ -137,19 +141,22 @@ class EndpointMonitor(object):
                                     # New server is up and running, add it, update PE launchCount
                                     servers_to_add.add(new_server)
                                     pes[pe.id] = pe.launchCount
+                                    # Get the ops in the PE that was restarted, so we can find and remove the old servers 
                                     ops_changed.extend(ops)
                                     # Assuming 1 server / PE (even if more than 1 rest operator in a PE), then we break out
                                     break
+
                     # After checking all PE's, if any new servers, remove old invalid ones and update job's servers
                     if servers_to_add:
-                        # Remove the servers, where the operators PE's launchCounts have changed
+                        # Remove the old servers, where the operators PE's launchCounts have changed
                         servers_to_remove = set([x for x in job_info.servers if x.oid in ops_changed])
                         valid_servers = job_info.servers - servers_to_remove
+                        # Add the new servers
                         new_servers = valid_servers.union(servers_to_add)
-
+                        # Update the job w/ the new info
                         jobs[j.id] = _Localjob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, ops, pes)
                     continue
-
+            print("CREATING NEW JOB")
             # New job, or job has changed (new generationId) - maybe now has a rest operator?
             jobs[j.id] = _job_new_incarnation(j)
 
@@ -209,8 +216,8 @@ class _Localjob:
         self.generationId = generationId
         self.applicationName = applicationName
         self.servers = servers
-        self.ops = ops
-        self.pes = pes
+        self.ops = ops # Dictionary mapping operator name's to 
+        self.pes = pes # Dictionary mapping PE id's to their launchCount
         self.ops_in_pe = ops_in_pe # Dictionary mapping PE.id to list of operator names that given PE contains
 
     def __str__(self):
