@@ -154,7 +154,7 @@ class EndpointMonitor(object):
                         # Add the new servers
                         new_servers = valid_servers.union(servers_to_add)
                         # Update the job w/ the new info
-                        jobs[j.id] = _Localjob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, ops, pes)
+                        jobs[j.id] = _Localjob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, ops, pes, job_info.ops_in_pe)
                     
             print("CREATING NEW JOB")
             # New job, or job has changed (new generationId) - maybe now has a rest operator?
