@@ -154,8 +154,9 @@ class EndpointMonitor(object):
                         # Add the new servers
                         new_servers = valid_servers.union(servers_to_add)
                         # Update the job w/ the new info
-                        jobs[j.id] = _Localjob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, job_info.ops, job_info.pes, job_info.ops_in_pe)
+                        jobs[j.id] = _Localjob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, job_info.ops, pes, job_info.ops_in_pe)
                     else:
+                        # PE's may or may not have restarted, but no new servers are up, thus don't update job, don't change config
                         jobs[j.id] = job_info
                     continue
             print("CREATING NEW JOB")
