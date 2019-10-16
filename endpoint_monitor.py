@@ -158,6 +158,7 @@ class EndpointMonitor(object):
                     else:
                         # PE's may or may not have restarted, but no new servers are up, thus don't update job, don't change config
                         jobs[j.id] = job_info
+                    print(jobs[j.id])
                     continue
             print("CREATING NEW JOB")
             # New job, or job has changed (new generationId) - maybe now has a rest operator?
