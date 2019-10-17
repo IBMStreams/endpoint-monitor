@@ -7,10 +7,10 @@ import os
 import streamsx.rest as sxr
 import streamsx.rest_primitives as srp
 
-Server = collections.namedtuple('Server', ['proto', 'ip', 'port', 'oid'])
+Server = collections.namedtuple('Server', ['proto', 'ip', 'port', 'pe_id'])
 
-def _get_server_address(op):
-    pe = op.get_pe()
+# TODO optionally pass in the PE's
+def _get_server_address(op, pe):
     # No get_resource on PE
     pe_resource = srp.Resource(pe.rest_client.make_request(pe.resource), pe.rest_client)
     ip = pe_resource.ipAddress
@@ -24,7 +24,7 @@ def _get_server_address(op):
 
     if ip and port:
         proto = 'https' if https else 'http'
-        return Server(proto, ip, port, op.name)
+        return Server(proto, ip, port, pe.id)
 
 def _job_new_incarnation(job):
     """Obtain the full server information for a job
@@ -43,8 +43,8 @@ def _job_new_incarnation(job):
     for op in job.get_operators():
         if op.operatorKind.startswith('com.ibm.streamsx.inet.rest::'):
             ops[op.name] = {'kind':op.operatorKind}
-            server = _get_server_address(op)
             pe = op.get_pe()
+            server = _get_server_address(op, pe)
             if server:
                 servers.add(server)
             pes[pe.id] = pe.launchCount
@@ -57,16 +57,11 @@ def _job_new_incarnation(job):
     return _Localjob(name, generationId, applicationName, servers, ops, pes, ops_in_pe)
 
 
-def _check_if_server_in_ops(job_info, ops):
-    servers = [server for server in job_info.servers if server.oid in ops]
+def _check_if_server_in_pe(job_info, pe_id):
+    servers = [server for server in job_info.servers if server.pe_id == pe_id]
     if servers:
         return True
     return False
-
-def _get_operator_objects(job_operators, ops):
-    # Get the operator objects where the operator names are in ops
-    return [x for x in job_operators if x.name in ops]
-
 
 class EndpointMonitor(object):
     def __init__(self, endpoint, config, job_filter, verify=None):
@@ -114,42 +109,47 @@ class EndpointMonitor(object):
                     #   if no, don't do anything (need to wait for server to come back up)
                     servers_to_add = set()
                     pes = job_info.pes
-                    ops_changed = []
-                    job_operators = j.get_operators()
+                    pes_changed = []
 
                     for pe in j.get_pes():
-                        ops = job_info.ops_in_pe[pe.id]
+                        # Get the names of all the rest operators in this PE, use get bc some pes might not have any rest operators
+                        op_names = job_info.ops_in_pe.get(pe.id)
+                        if op_names is None:
+                            # PE does not contain any rest operators, thus don't care about it, go onto next PE
+                            continue
                         if pes[pe.id] == pe.launchCount:
                             print("SAME LAUNCHCOUNT")
-                            # Check if this PE has any operators w/ a server
-                            if not _check_if_server_in_ops(job_info, ops):
+                            # Check if this PE has any existing servers
+                            if not _check_if_server_in_pe(job_info, pe.id):
                                 # PE launchCount same, and no servers in this PE, thus server just starting up, check if it is up and running
-                                for op in _get_operator_objects(job_operators, ops):
-                                    new_server = _get_server_address(op)
-                                    if new_server:
-                                        # New server is up and running, add it
-                                        servers_to_add.add(new_server)
-                                        # Assuming 1 server / PE (even if more than 1 rest operator in a PE), then we break out
-                                        break
+                                for op_name in op_names:
+                                    op_obj = j.get_operators(op_name)
+                                    if op_obj: # TODO Do i need this if check?
+                                        new_server = _get_server_address(op_obj[0], pe)
+                                        if new_server:
+                                            # New server is up and running, add it, assumes 1 server/PE (even if more than 1 rest operator in a PE)
+                                            servers_to_add.add(new_server)
+                                            break
                         else:
                             print("DIFFERENT LAUNCHCOUNT")
-                            # PE launchCount different, thus PE restarted, get all ops in this PE, and if a new server is up, remove old ones and update config
-                            # Get all the operators whose PE's launchCounts have changed
-                            for op in _get_operator_objects(job_operators, ops):
-                                new_server = _get_server_address(op)
-                                if new_server:
-                                    # New server is up and running, add it, update PE launchCount
-                                    servers_to_add.add(new_server)
-                                    pes[pe.id] = pe.launchCount
-                                    # Get the ops in the PE that was restarted, so we can find and remove the old servers 
-                                    ops_changed.extend(ops)
-                                    # Assuming 1 server / PE (even if more than 1 rest operator in a PE), then we break out
-                                    break
+                            # PE launchCount different, thus PE restarted, iterate through the op names in this PE
+                            # For each op name, get the actual op object and check if new server is up
+                            for op_name in op_names:
+                                op_obj = j.get_operators(op_name)
+                                if op_obj: # TODO Do i need this if check?
+                                    new_server = _get_server_address(op_obj[0], pe)
+                                    if new_server:
+                                        # New server is up and running, add it, assumes 1 server/PE (even if more than 1 rest operator in a PE), update PE launchCount
+                                        servers_to_add.add(new_server)
+                                        pes[pe.id] = pe.launchCount
+                                        # Add the PE to the list, so we can find & remove all the old invalid servers that have this pe id
+                                        pes_changed.add(pe.id)
+                                        break
 
                     # After checking all PE's, if any new servers, remove old invalid ones and update job's servers
                     if servers_to_add:
-                        # Remove the old servers, where the operators PE's launchCounts have changed
-                        servers_to_remove = set([x for x in job_info.servers if x.oid in ops_changed])
+                        # Remove the old servers where the PE's launchCounts have changed
+                        servers_to_remove = set([x for x in job_info.servers if x.pe_id in pes_changed])
                         valid_servers = job_info.servers - servers_to_remove
                         # Add the new servers
                         new_servers = valid_servers.union(servers_to_add)
@@ -219,9 +219,9 @@ class _Localjob:
         self.generationId = generationId
         self.applicationName = applicationName
         self.servers = servers
-        self.ops = ops # Dictionary mapping operator name's to 
+        self.ops = ops # Dictionary mapping operator name's to
         self.pes = pes # Dictionary mapping PE id's to their launchCount
-        self.ops_in_pe = ops_in_pe # Dictionary mapping PE.id to list of operator names that given PE contains
+        self.ops_in_pe = ops_in_pe # Dictionary mapping a PE.id to a list of the names of rest operators, that given PE contains (ie ops_in_pe[pe_id] = [op1_name, op2_name])
 
     def __str__(self):
         return "servers=%s, ops=%s, pes=%s" % (self.servers, self.ops, self.pes)
