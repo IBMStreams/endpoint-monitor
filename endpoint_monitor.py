@@ -9,7 +9,6 @@ import streamsx.rest_primitives as srp
 
 Server = collections.namedtuple('Server', ['proto', 'ip', 'port', 'pe_id'])
 
-# TODO optionally pass in the PE's
 def _get_server_address(op, pe):
     # No get_resource on PE
     pe_resource = srp.Resource(pe.rest_client.make_request(pe.resource), pe.rest_client)
@@ -54,7 +53,7 @@ def _job_new_incarnation(job):
             else:
                 ops_in_pe[pe.id] = [op.name]
 
-    return _Localjob(name, generationId, applicationName, servers, ops, pes, ops_in_pe)
+    return EndpointJob(name, generationId, applicationName, servers, ops, pes, ops_in_pe)
 
 
 def _check_if_server_in_pe(job_info, pe_id):
@@ -154,7 +153,7 @@ class EndpointMonitor(object):
                         # Add the new servers
                         new_servers = valid_servers.union(servers_to_add)
                         # Update the job w/ the new info
-                        jobs[j.id] = _Localjob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, job_info.ops, pes, job_info.ops_in_pe)
+                        jobs[j.id] = EndpointJob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, job_info.ops, pes, job_info.ops_in_pe)
                     else:
                         # PE's may or may not have restarted, but no new servers are up, thus don't update job, don't change config
                         jobs[j.id] = job_info
@@ -201,7 +200,6 @@ class EndpointMonitor(object):
             self._config.create(jobid, ne)
         self._jobs[jobid] = ne
 
-
     def run(self):
         self._config.clean()
         while True:
@@ -213,13 +211,13 @@ class EndpointMonitor(object):
                  print("ERROR", e)
                  time.sleep(1)
 
-class _Localjob:
+class EndpointJob:
     def __init__(self, name, generationId, applicationName, servers=set(), ops={}, pes={}, ops_in_pe={}):
         self.name = name
         self.generationId = generationId
         self.applicationName = applicationName
         self.servers = servers
-        self.ops = ops # Dictionary mapping operator name's to
+        self.ops = ops # Dictionary mapping rest operator name's to operatorKind
         self.pes = pes # Dictionary mapping PE id's to their launchCount
         self.ops_in_pe = ops_in_pe # Dictionary mapping a PE.id to a list of the names of rest operators, that given PE contains (ie ops_in_pe[pe_id] = [op1_name, op2_name])
 
