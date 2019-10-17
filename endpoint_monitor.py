@@ -209,7 +209,7 @@ class EndpointMonitor(object):
                  time.sleep(1)
 
 class EndpointJob:
-    def __init__(self, name, generationId, applicationName, servers=set(), ops={}, pes={}, ops_in_pe={}):
+    def __init__(self, name, generationId, applicationName, servers, ops, pes, ops_in_pe):
         self.name = name
         self.generationId = generationId
         self.applicationName = applicationName
