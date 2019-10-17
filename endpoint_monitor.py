@@ -107,7 +107,6 @@ class EndpointMonitor(object):
                     #   if yes, add it and update PE launchCount, then remove old invalid servers
                     #   if no, don't do anything (need to wait for server to come back up)
                     servers_to_add = set()
-                    pes = job_info.pes
                     pes_changed = []
 
                     for pe in j.get_pes():
@@ -116,14 +115,14 @@ class EndpointMonitor(object):
                         if op_names is None:
                             # PE does not contain any rest operators, thus don't care about it, go onto next PE
                             continue
-                        if pes[pe.id] == pe.launchCount:
+                        if job_info.pes[pe.id] == pe.launchCount:
                             print("SAME LAUNCHCOUNT")
                             # Check if this PE has any existing servers
                             if not _check_if_server_in_pe(job_info, pe.id):
                                 # PE launchCount same, and no servers in this PE, thus server just starting up, check if it is up and running
                                 for op_name in op_names:
                                     op_obj = j.get_operators(op_name)
-                                    if op_obj: # TODO Do i need this if check?
+                                    if op_obj:
                                         new_server = _get_server_address(op_obj[0], pe)
                                         if new_server:
                                             # New server is up and running, add it, assumes 1 server/PE (even if more than 1 rest operator in a PE)
@@ -135,12 +134,12 @@ class EndpointMonitor(object):
                             # For each op name, get the actual op object and check if new server is up
                             for op_name in op_names:
                                 op_obj = j.get_operators(op_name)
-                                if op_obj: # TODO Do i need this if check?
+                                if op_obj:
                                     new_server = _get_server_address(op_obj[0], pe)
                                     if new_server:
                                         # New server is up and running, add it, assumes 1 server/PE (even if more than 1 rest operator in a PE), update PE launchCount
                                         servers_to_add.add(new_server)
-                                        pes[pe.id] = pe.launchCount
+                                        job_info.pes[pe.id] = pe.launchCount
                                         # Add the PE to the list, so we can find & remove all the old invalid servers that have this pe id
                                         pes_changed.append(pe.id)
                                         break
@@ -153,11 +152,10 @@ class EndpointMonitor(object):
                         # Add the new servers
                         new_servers = valid_servers.union(servers_to_add)
                         # Update the job w/ the new info
-                        jobs[j.id] = EndpointJob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, job_info.ops, pes, job_info.ops_in_pe)
+                        jobs[j.id] = EndpointJob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, job_info.ops, job_info.pes, job_info.ops_in_pe)
                     else:
                         # PE's may or may not have restarted, but no new servers are up, thus don't update job, don't change config
                         jobs[j.id] = job_info
-                    print(jobs[j.id])
                     continue
             print("CREATING NEW JOB")
             # New job, or job has changed (new generationId) - maybe now has a rest operator?
@@ -174,8 +172,7 @@ class EndpointMonitor(object):
             ne = current_jobs.pop(jobid, None)
             if ne is None:
                 self._delete_job(jobid)
-            # Job still running
-            # Check if job's servers have changed, if so update nginx config
+            # Job still running, check if job's servers have changed, if so update nginx config
             elif ne.servers != self._jobs[jobid].servers:
                 self._update_job(jobid, ne)
         for jobid in current_jobs:
