@@ -170,7 +170,7 @@ class EndpointMonitor(object):
                         jobs[j.id] = job_info
                         continue
 
-                    jobs[j.id] = _update_job(job_info, j)
+                    jobs[j.id] = _job_update(job_info, j)
                     continue
 
             print("CREATING NEW JOB")
