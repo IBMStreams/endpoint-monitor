@@ -142,7 +142,7 @@ class EndpointMonitor(object):
                                         servers_to_add.add(new_server)
                                         pes[pe.id] = pe.launchCount
                                         # Add the PE to the list, so we can find & remove all the old invalid servers that have this pe id
-                                        pes_changed.add(pe.id)
+                                        pes_changed.append(pe.id)
                                         break
 
                     # After checking all PE's, if any new servers, remove old invalid ones and update job's servers
