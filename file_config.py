@@ -28,19 +28,19 @@ class FileWriter(object):
   
     def create(self, jobid, config):
         entry = {}
-        if config['name'] == config['applicationName'] + '_' + jobid:
+        if config.name == config.applicationName + '_' + jobid:
             location = '/streams/jobs/' + str(jobid) + '/'
         else:
-            location = '/' + config['name'] + '/'
+            location = '/' + config.name + '/'
 
         entry['location'] = location
-        entry['servers'] = config['servers']
-        config['config_file'] = self._write_file(jobid, [entry])
+        entry['servers'] = config.servers
+        config.config_file = self._write_file(jobid, [entry])
         self._reload()
 
     def delete(self, jobid, config):
-        if 'config_file' in config:
-            os.remove(config['config_file'])
+        if hasattr(config, 'config_file'):
+            os.remove(config.config_file)
         self._reload()
 
     def update(self, jobid, old_config, config):
