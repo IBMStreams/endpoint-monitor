@@ -24,7 +24,6 @@ class FileWriter(object):
             os.mkfifo(self._pipe_name)
   
     def create(self, jobid, job_config):
-        entry = {}
         if job_config.name == job_config.applicationName + '_' + jobid:
             location = '/streams/jobs/' + str(jobid) + '/'
         else:
@@ -62,7 +61,7 @@ class FileWriter(object):
         #    f.write('}\n'
 
         # Work-around dojo not in v5 app images
-        f.write('location ^~ %sstreamsx.inet.dojo/ {\n' % entry['location'])
+        f.write('location ^~ %sstreamsx.inet.dojo/ {\n' % location)
         f.write('  proxy_pass https://ajax.googleapis.com/ajax/libs/dojo/1.14.1/;\n')
         f.write('}\n')
 
@@ -75,16 +74,16 @@ class FileWriter(object):
         # the server (as it is not protected by any signature authentication).
 
         # The external location
-        f.write('location %s {\n' % entry['location'])
+        f.write('location %s {\n' % location)
         if self._signature:
-            f.write("  set $redirectLocation '/@internal%s';\n" % entry['location'])
+            f.write("  set $redirectLocation '/@internal%s';\n" % location)
             f.write("  js_content checkHTTP;\n")
         else:
             self._proxy_location(f, proto, server_root_url)
         f.write('}\n')
 
         if self._signature:
-            f.write('location /@internal%s {\n' % entry['location'])
+            f.write('location /@internal%s {\n' % location)
             f.write('  internal;\n');
             self._proxy_location(f, proto, server_root_url)
             f.write('}\n')
