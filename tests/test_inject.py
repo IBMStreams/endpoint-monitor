@@ -1,6 +1,9 @@
 # coding=utf-8
 # Licensed Materials - Property of IBM
 # Copyright IBM Corp. 2019
+
+import random
+import string
 import unittest
 
 from streamsx.topology.topology import Topology
@@ -13,13 +16,20 @@ import os
 import requests
 import time
 
+def _rand_path():
+    return ''.join(random.choices(string.ascii_uppercase, k=8))
+  
 class TestEmInject(unittest.TestCase):
     _multiprocess_can_split_ = True
+    _TK = None
+
+    @classmethod
+    def setupClass(cls):
+        TestEmInject._TK = endpoint.download_toolkit()
 
     def setUp(self):
         Tester.setup_distributed(self)
         self._base_url = os.environ['ENDPOINT_MONITOR']
-        self._tk = endpoint.download_toolkit()
         self._job_name = None
         self.N = 163
 
@@ -56,13 +66,24 @@ class TestEmInject(unittest.TestCase):
             self.assertEqual(rc.status_code, 204, str(rc))
 
     def test_inject(self):
+        self._monitor = None
+        self._inject_tester()
+
+    @unittest.skipUnless('ENDPOINT_NAME' in os.environ, "Need ENDPOINT_NAME set for HTTPS")
+    def test_inject_https(self):
+        self._monitor = os.environ['ENDPOINT_NAME']
+        self._inject_tester()
+        
+    def _inject_tester(self):
         """ Test injecting.
         """
         topo = Topology()
-        s = endpoint.inject(topo, name='T', context='test1')
-        streamsx.spl.toolkit.add_toolkit(topo, self._tk)
+        context = _rand_path()
+        name = _rand_path()
+        s = endpoint.inject(topo, name=name, context=context, monitor=self._monitor)
+        streamsx.spl.toolkit.add_toolkit(topo, TestEmInject._TK)
 
-        self._path = '/test1/T/ports/output/0/inject';
+        self._path = '/' + context + '/' + name + '/ports/output/0/inject';
 
         self.tester = Tester(topo)
         self.tester.local_check = self._inject
