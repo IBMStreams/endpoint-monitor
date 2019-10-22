@@ -2,6 +2,7 @@
 # Copyright IBM Corp. 2019
 
 import requests
+import endpoint_monitor
 
 def server_url(server):
     return '%s://%s:%s/' % (server.proto, server.ip, server.port)
@@ -31,4 +32,4 @@ def fill_in_details(endjob):
     for server in endjob.servers:
         url = server_url(server)
         contexts = set()
-        endjob.server_details[server] = ServerDetails(url, contexts)
+        endjob.server_details[server] = endpoint_monitor.ServerDetail(url, contexts)
