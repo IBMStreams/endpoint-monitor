@@ -9,12 +9,10 @@ def server_url(server):
 
 
 # Currently unused
-def find_contexts(server, client_cert):
-    if proto != 'http':
-        return set(), set()
+def find_contexts(server, url, client_cert):
     oppaths=set()
     contexts=set()
-    ports_url = server_url(server) + 'ports/info'
+    ports_url = url + 'ports/info'
     ports = requests.get(ports_url, cert=client_cert, verify=False).json()
     if 'exposedPorts' in ports:
         for port in ports['exposedPorts']:
@@ -31,7 +29,7 @@ def find_contexts(server, client_cert):
 def fill_in_details(endjob, client_cert):
     for server in endjob.servers:
         url = server_url(server)
-        oppaths, contexts = find_contexts(server, client_cert)
+        oppaths, contexts = find_contexts(server, url, client_cert)
         endjob.server_details[server] = endpoint_monitor.ServerDetail(url, contexts)
         print('Server', server)
         print('ServerDetail', endjob.server_details[server])
