@@ -1,23 +1,31 @@
 # Licensed Materials - Property of IBM
 # Copyright IBM Corp. 2019
 
+#
+# Code that handles specifics and interactions
+# with the Jetty servers running in the REST operators.
+#
+
 import requests
 import endpoint_monitor
 
 def server_url(server):
     return '%s://%s:%s/' % (server.proto, server.ip, server.port)
 
+# Pull information ports/info for the Jetty server to
+# identify contexts, paths and exposed ports.
+#
+# Returns set of contexts, set of paths and the exposed ports information
 
-# Currently unused
-def find_contexts(server):
-    if proto != 'http':
-        return set(), set()
+def _find_contexts(server, url, client_cert):
     oppaths=set()
     contexts=set()
-    ports_url = server_url(server) + 'ports/info'
-    ports = requests.get(ports_url, verify=False).json()
+    exposed_ports = None
+    ports_url = url + 'ports/info'
+    ports = requests.get(ports_url, cert=client_cert, verify=False).json()
     if 'exposedPorts' in ports:
-        for port in ports['exposedPorts']:
+        exposed_ports = ports['exposedPorts']
+        for port in exposed_ports:
             cps = port['contextPaths']
             for id_ in cps:
                 cp = cps[id_].replace('\\', '')
@@ -25,11 +33,16 @@ def find_contexts(server):
                 contexts.add(scp[1])
                 oppaths.add(scp[1]+'/'+scp[2])
 
-    return oppaths, contexts
+    return contexts, oppaths, exposed_ports
 
-
-def fill_in_details(endjob):
+#
+# Fills in the details for a given server to return
+# a ServerDetail tuple.
+#
+def fill_in_details(endjob, client_cert):
     for server in endjob.servers:
         url = server_url(server)
-        contexts = set()
-        endjob.server_details[server] = endpoint_monitor.ServerDetail(url, contexts)
+        contexts, paths, ports = _find_contexts(server, url, client_cert)
+        endjob.server_details[server] = endpoint_monitor.ServerDetail(url, contexts, paths, ports)
+        print('Server', server)
+        print('ServerDetail', endjob.server_details[server])

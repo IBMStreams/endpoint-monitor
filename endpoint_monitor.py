@@ -11,7 +11,7 @@ import rest_ops
 
 Server = collections.namedtuple('Server', ['proto', 'ip', 'port', 'pe_id'])
 
-ServerDetail = collections.namedtuple('ServerDetails', ['url', 'contexts'])
+ServerDetail = collections.namedtuple('ServerDetails', ['url', 'contexts', 'paths', 'ports'])
 
 def _get_server_address(op, pe):
     # No get_resource on PE
@@ -136,11 +136,12 @@ def _check_if_server_in_pe(job_info, pe_id):
     return False
 
 class EndpointMonitor(object):
-    def __init__(self, endpoint, config, job_filter, verify=None):
+    def __init__(self, endpoint, config, job_filter, client_cert, verify=None):
         self._jobs = {}
         self._endpoint = endpoint
         self._config = config
         self._job_filter = job_filter
+        self._client_cert = client_cert
         self._verify = verify
         self._inst = None
 
@@ -207,7 +208,7 @@ class EndpointMonitor(object):
     def _update_job(self, jobid, ne):
         print("UPDATE:", jobid, ne)
         if ne.servers:
-            rest_ops.fill_in_details(ne)
+            rest_ops.fill_in_details(ne, self._client_cert)
             self._config.update(jobid, self._jobs[jobid], ne)
         self._jobs[jobid] = ne
 
@@ -215,7 +216,7 @@ class EndpointMonitor(object):
     def _new_job(self, jobid, ne):
         print("NEW:", jobid, ne, bool(ne.servers))
         if ne.servers:
-            rest_ops.fill_in_details(ne)
+            rest_ops.fill_in_details(ne, self._client_cert)
             self._config.create(jobid, ne)
         self._jobs[jobid] = ne
 
