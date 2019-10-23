@@ -53,21 +53,24 @@ class FileWriter(object):
         return fcfn
 
     def _config_contents(self, f, jobid, location, job_config):
-        #f.write('upstream streams_job_%s {\n' % jobid)
-        #proto = None
-        for server in job_config.servers:
-             proto = server.proto
-        #    f.write('  server %s;\n' % server_url(server))
-        #    f.write('}\n'
-
         # Work-around dojo not in v5 app images
         f.write('location ^~ %sstreamsx.inet.dojo/ {\n' % location)
         f.write('  proxy_pass https://ajax.googleapis.com/ajax/libs/dojo/1.14.1/;\n')
         f.write('}\n')
 
-        server_root_url = job_config.server_details[server].url
+        for server in job_config.servers:
+            proto = server.proto
+            details = job_config.server_details[server]
+            server_root_url = details.url
 
-        self._proxy_entry(f, location, proto, server_root_url)
+            for p in details.paths:
+                loc = location + p + '/'
+                url = server_root_url + p + '/'
+                self._proxy_entry(f, loc, proto, url)
+
+        # A final catch all, but only if there is a single server
+        if len(job_config.servers) == 1:
+            self._proxy_entry(f, location, proto, server_root_url)
 
     def _proxy_entry(self, f, location, proto, target_url):
 
@@ -99,7 +102,6 @@ class FileWriter(object):
         f.write('  proxy_set_header X-Forwarded-Proto %s ;\n' % proto)
         f.write('  proxy_set_header  X-Forwarded-For $remote_addr;\n')
         f.write('  proxy_set_header  X-Forwarded-Host $remote_addr;\n')
-        #f.write('  proxy_pass %s://streams_job_%s/;\n' % (proto, jobid))
         f.write('  proxy_pass %s;\n' % url)
 
         if proto == 'https':
