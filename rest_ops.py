@@ -23,13 +23,13 @@ def find_contexts(server, url, client_cert):
                 contexts.add(scp[1])
                 oppaths.add(scp[1]+'/'+scp[2])
 
-    return oppaths, contexts
+    return contexts, oppaths
 
 
 def fill_in_details(endjob, client_cert):
     for server in endjob.servers:
         url = server_url(server)
-        oppaths, contexts = find_contexts(server, url, client_cert)
-        endjob.server_details[server] = endpoint_monitor.ServerDetail(url, contexts)
+        contexts, paths = find_contexts(server, url, client_cert)
+        endjob.server_details[server] = endpoint_monitor.ServerDetail(url, contexts, paths)
         print('Server', server)
         print('ServerDetail', endjob.server_details[server])
