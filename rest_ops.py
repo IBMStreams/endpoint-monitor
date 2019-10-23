@@ -31,7 +31,7 @@ def find_contexts(server, url, client_cert):
 def fill_in_details(endjob, client_cert):
     for server in endjob.servers:
         url = server_url(server)
-        contexts, paths = find_contexts(server, url, client_cert)
-        endjob.server_details[server] = endpoint_monitor.ServerDetail(url, contexts, paths, exposed_ports)
+        contexts, paths, ports = find_contexts(server, url, client_cert)
+        endjob.server_details[server] = endpoint_monitor.ServerDetail(url, contexts, paths, ports)
         print('Server', server)
         print('ServerDetail', endjob.server_details[server])
