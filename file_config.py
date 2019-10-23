@@ -74,8 +74,8 @@ class FileWriter(object):
                 self._proxy_entry(f, loc, proto, url)
 
         # A final catch all, but only if there is a single server
-        if len(job_config.servers) == 1:
-            self._proxy_entry(f, location, proto, server_root_url)
+        # Maps to only one of the servers.
+        self._proxy_entry(f, location, proto, server_root_url)
 
     def _proxy_entry(self, f, location, proto, target_url):
 
