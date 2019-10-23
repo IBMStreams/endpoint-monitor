@@ -68,6 +68,10 @@ class FileWriter(object):
                 url = server_root_url + p + '/'
                 self._proxy_entry(f, loc, proto, url)
 
+            for c in details.contexts:
+                loc = location + c + '/'
+                url = server_root_url + c + '/'
+
         # A final catch all, but only if there is a single server
         if len(job_config.servers) == 1:
             self._proxy_entry(f, location, proto, server_root_url)
@@ -81,7 +85,7 @@ class FileWriter(object):
         # the server (as it is not protected by any signature authentication).
 
         # The external location
-        f.write('location %s {\n' % location)
+        f.write('location ^~ %s {\n' % location)
         if self._signature:
             f.write("  set $redirectLocation '/@internal%s';\n" % location)
             f.write("  js_content checkHTTP;\n")
@@ -90,7 +94,7 @@ class FileWriter(object):
         f.write('}\n')
 
         if self._signature:
-            f.write('location /@internal%s {\n' % location)
+            f.write('location ~^ /@internal%s {\n' % location)
             f.write('  internal;\n');
             self._proxy_location(f, proto, target_url)
             f.write('}\n')
