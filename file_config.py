@@ -67,6 +67,10 @@ class FileWriter(object):
 
         server_root_url = job_config.server_details[server].url
 
+        self._proxy_entry(location, server_root_url)
+
+    def _proxy_entry(self, location, target_url):
+
         # If we are checking signatures then two locations are
         # created. The external one that invokes Javascript
         # to verify the signature and then redirect to the internal one.
@@ -79,13 +83,13 @@ class FileWriter(object):
             f.write("  set $redirectLocation '/@internal%s';\n" % location)
             f.write("  js_content checkHTTP;\n")
         else:
-            self._proxy_location(f, proto, server_root_url)
+            self._proxy_location(f, proto, target_url)
         f.write('}\n')
 
         if self._signature:
             f.write('location /@internal%s {\n' % location)
             f.write('  internal;\n');
-            self._proxy_location(f, proto, server_root_url)
+            self._proxy_location(f, proto, target_url)
             f.write('}\n')
 
     def _proxy_location(self, f, proto, url):
