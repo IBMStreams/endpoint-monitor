@@ -58,22 +58,26 @@ class FileWriter(object):
         f.write('  proxy_pass https://ajax.googleapis.com/ajax/libs/dojo/1.14.1/;\n')
         f.write('}\n')
 
+        multi_servers = len(job_config.servers) > 1
+
         for server in job_config.servers:
             proto = server.proto
             details = job_config.server_details[server]
             server_root_url = details.url
 
-            for p in details.paths:
-                loc = location + p + '/'
-                url = server_root_url + p + '/'
-                self._proxy_entry(f, loc, proto, url)
+            if multi_servers:
+                for p in details.paths:
+                    loc = location + p + '/'
+                    url = server_root_url + p + '/'
+                    self._proxy_entry(f, loc, proto, url)
 
-            for c in details.contexts:
-                loc = location + c + '/'
-                url = server_root_url + c + '/'
-                self._proxy_entry(f, loc, proto, url)
+                for c in details.contexts:
+                    loc = location + c + '/'
+                    url = server_root_url + c + '/'
+                    self._proxy_entry(f, loc, proto, url)
 
-        # A final catch all, but only if there is a single server
+        # A final catch all
+        # Is the sole location for a single server
         # Maps to only one of the servers.
         self._proxy_entry(f, location, proto, server_root_url)
 
