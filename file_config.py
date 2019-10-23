@@ -71,6 +71,7 @@ class FileWriter(object):
             for c in details.contexts:
                 loc = location + c + '/'
                 url = server_root_url + c + '/'
+                self._proxy_entry(f, loc, proto, url)
 
         # A final catch all, but only if there is a single server
         if len(job_config.servers) == 1:
