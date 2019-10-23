@@ -67,9 +67,9 @@ class FileWriter(object):
 
         server_root_url = job_config.server_details[server].url
 
-        self._proxy_entry(location, server_root_url)
+        self._proxy_entry(f, location, proto, server_root_url)
 
-    def _proxy_entry(self, location, target_url):
+    def _proxy_entry(self, f, location, proto, target_url):
 
         # If we are checking signatures then two locations are
         # created. The external one that invokes Javascript
