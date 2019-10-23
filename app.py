@@ -67,7 +67,7 @@ client_cert = _process_streams_certs()
 
 cfg = FileWriter(location=os.path.join(OPT, 'job-configs'), client_cert=client_cert, signature=_has_signature_secret())
 
-em = EndpointMonitor(endpoint=sws_service, config=cfg, job_filter=job_filter, client_cert, verify=False)
+em = EndpointMonitor(endpoint=sws_service, config=cfg, job_filter=job_filter, client_cert=client_cert, verify=False)
 
 # Create the application configuration
 certs_secret = os.path.join(SECRETS, 'streams-certs')
