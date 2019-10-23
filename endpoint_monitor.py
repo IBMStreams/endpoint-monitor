@@ -7,7 +7,11 @@ import os
 import streamsx.rest as sxr
 import streamsx.rest_primitives as srp
 
+import rest_ops
+
 Server = collections.namedtuple('Server', ['proto', 'ip', 'port', 'pe_id'])
+
+ServerDetail = collections.namedtuple('ServerDetails', ['url', 'contexts'])
 
 def _get_server_address(op, pe):
     # No get_resource on PE
@@ -203,6 +207,7 @@ class EndpointMonitor(object):
     def _update_job(self, jobid, ne):
         print("UPDATE:", jobid, ne)
         if ne.servers:
+            rest_ops.fill_in_details(ne)
             self._config.update(jobid, self._jobs[jobid], ne)
         self._jobs[jobid] = ne
 
@@ -210,6 +215,7 @@ class EndpointMonitor(object):
     def _new_job(self, jobid, ne):
         print("NEW:", jobid, ne, bool(ne.servers))
         if ne.servers:
+            rest_ops.fill_in_details(ne)
             self._config.create(jobid, ne)
         self._jobs[jobid] = ne
 
@@ -230,6 +236,7 @@ class EndpointJob:
         self.generationId = generationId
         self.applicationName = applicationName
         self.servers = servers
+        self.server_details = dict()
         self.ops = ops # Dictionary mapping rest operator name's to operatorKind
         self.pes = pes # Dictionary mapping PE id's to their launchCount
         self.ops_in_pe = ops_in_pe # Dictionary mapping a PE.id to a list of the names of rest operators, that given PE contains (ie ops_in_pe[pe_id] = [op1_name, op2_name])
