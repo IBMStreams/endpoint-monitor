@@ -1,17 +1,43 @@
-# endpoint-monitor
-Nginx reverse proxy sample application to Streams REST operators.
+## endpoint-monitor OpenShift application
+
+Nginx reverse proxy sample application to Streams REST endpoints.
 
 # UNDER DEVELOPMENT
 
 **Application is under development, apis, behavior etc. are subject to change.**
 
-# Overview
+## Overview
 
-Endpoint-monitor is an Openshift application that monitors running jobs in a single Streams instance (within the same cluster) for REST SPL operators, such as `com.ibm.streamsx.inet.rest::HTTPJSONInjection` and `com.ibm.streamsx.inet.rest::HTTPTupleView`.
+Endpoint-monitor is an Openshift application that monitors running jobs in a single Streams Cloud Pak for Data instance (within the same cluster and namespace) for REST endpoints, such as injection of tuples from a REST POST into a stream.
+Streams Cloud Pak for Data integrated and standalone instances are supported.
 
 The endpoints from the REST operators are then exposed with fixed URLs through a service using an Nginx reverse proxy. Thus if a PE hosting a REST operator restarts and changes its IP address and/or server port number endpoint-monitor will update the nginx configuration to allow the fixed URL to find the operator correctly.
 
-# Setup
+## Streams application endpoints
+
+### Python topology applications
+
+Endpoints are supported by the `streamsx.endpoint` package, installable from pip:
+
+   * PyPi - https://pypi.org/project/streamsx.endpoint/
+   * Documentation - https://streamsxendpoint.readthedocs.io/en/1.0.0/
+   
+Example of an application endpoint that supports HTTP POST requests that insert the body of the POST as JSON into the stream as a single tuple.
+
+```
+from streamsx.topology.topology import Topology
+import streamsx.endpoint as endpoint
+
+topo = Topology()
+
+positions = endpoint.inject(topo, context='vehicles', name='position', monitor='streams-em')
+```
+
+### SPL applications
+
+TBD
+
+## Setup
 
 Pick a name for the application (e.g. `buses-em`), this will be passed to *oc new-app* as the parameter `NAME` and will also be the name of the Kubernetes service exposes the REST endpoints. This name is referred to a `${NAME}` in the following steps.
 
@@ -69,7 +95,7 @@ oc new-app \
 * `JOB_GROUP` - Job group pattern. Only jobs with groups that match this pattern will be monitored for REST operators. **Currently only a actual job group can be supplied, not a regular expression.**
 * `STREAMS_USER_SECRET` - Name of the secret from step 1, defaults to `streams-user`.
 
-# URL mapping
+## URL mapping
 
 Current support is limited to:
 
@@ -91,7 +117,7 @@ Example URLs within the cluster for *application-name* of `em` in project `mypro
  * `https://em.myproject.svc:8443/streams/jobs/7/ports/info` with a web-server in job 7:
  
 
-# Implementation notes
+## Implementation notes
 
 The template uses the nginx and python 3.6 source to image (s2i) setups to define two containers (nginx & python) within a single pod. The two containers share a local volume (`/opt/streams_job_configs`) and communicate through a named pipe on the volume.
  * nginx 1.14 s2i - https://github.com/sclorg/nginx-container/tree/master/1.14
