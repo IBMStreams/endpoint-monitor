@@ -54,7 +54,7 @@ def _create_aliases(ports):
     aliases = {}
     for port in ports:
         kind = port['operatorKind']
-        if kind == 'com.ibm.streamsx.inet.rest::HTTPJsonInject':
+        if kind == 'com.ibm.streamsx.inet.rest::HTTPJsonInjection':
             cps = port['contextPaths']
             _add_alias(aliases, cps['inject'], 0)
 
