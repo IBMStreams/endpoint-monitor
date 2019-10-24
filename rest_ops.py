@@ -43,7 +43,7 @@ def _make_port_alias(path, port, output=True):
     r += '/'
     alias = path.replace(r, '')
     if alias != path:
-        return path
+        return alias
 
 def _add_alias(aliases, path, port, output=True):
     alias = _make_port_alias(path, 0)
