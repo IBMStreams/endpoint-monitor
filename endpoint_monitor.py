@@ -11,7 +11,7 @@ import rest_ops
 
 Server = collections.namedtuple('Server', ['proto', 'ip', 'port', 'pe_id'])
 
-ServerDetail = collections.namedtuple('ServerDetails', ['url', 'contexts', 'paths', 'ports'])
+ServerDetail = collections.namedtuple('ServerDetails', ['url', 'contexts', 'paths', 'ports', 'aliases'])
 
 def _get_server_address(op, pe):
     # No get_resource on PE
