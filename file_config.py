@@ -53,19 +53,67 @@ class FileWriter(object):
         return fcfn
 
     def _config_contents(self, f, jobid, location, job_config):
-        #f.write('upstream streams_job_%s {\n' % jobid)
-        #proto = None
-        for server in job_config.servers:
-             proto = server.proto
-        #    f.write('  server %s;\n' % server_url(server))
-        #    f.write('}\n'
-
         # Work-around dojo not in v5 app images
         f.write('location ^~ %sstreamsx.inet.dojo/ {\n' % location)
         f.write('  proxy_pass https://ajax.googleapis.com/ajax/libs/dojo/1.14.1/;\n')
         f.write('}\n')
 
-        server_root_url = job_config.server_details[server].url
+        multi_servers = len(job_config.servers) > 1
+
+        for server in job_config.servers:
+            proto = server.proto
+            details = job_config.server_details[server]
+            server_root_url = details.url
+ 
+            # The job is exposed as a single logical entry
+            # under location/*
+
+            # However the job may contain multiple REST endpoint
+            # operators in multiple servers. This is to avoid forcing
+            # unrelated operators into the same PE and hence same
+            # server. For example an inject operator should not be
+            # forced into a tuple view (expose) operator that
+            # is at the end of the analytic flow.
+
+            # This for example we may have operators of:
+            # C1/A  - Server S1
+            # C2/B  - Server S1
+            # C1/C  - Server S2
+            
+            # Thus we create proxy mappings as follows:
+
+            # Contexts that will resolve static files
+            # exposed by the operator(s)
+            # The assumption is that if a job is exposing a context
+            # and resource files then they files are consistent across
+            # operators.
+            # C1    ----> S1/C1
+            # C2    ----> S1/C2
+            # C1    ----> S2/C1
+
+            # Operator paths that will resolve paths specific
+            # to an individual operator's ports/streams
+            # C1/A  ----> S1/C1/A
+            # C2/B  ----> S1/C2/B
+            # C1/C  ----> S2/C1/C
+       
+            if multi_servers:
+                for p in details.paths:
+                    loc = location + p + '/'
+                    url = server_root_url + p + '/'
+                    self._proxy_entry(f, loc, proto, url)
+
+                for c in details.contexts:
+                    loc = location + c + '/'
+                    url = server_root_url + c + '/'
+                    self._proxy_entry(f, loc, proto, url)
+
+        # A final catch all
+        # Is the sole location for a single server
+        # Maps to only one of the servers.
+        self._proxy_entry(f, location, proto, server_root_url)
+
+    def _proxy_entry(self, f, location, proto, target_url):
 
         # If we are checking signatures then two locations are
         # created. The external one that invokes Javascript
@@ -74,18 +122,18 @@ class FileWriter(object):
         # the server (as it is not protected by any signature authentication).
 
         # The external location
-        f.write('location %s {\n' % location)
+        f.write('location ^~ %s {\n' % location)
         if self._signature:
             f.write("  set $redirectLocation '/@internal%s';\n" % location)
             f.write("  js_content checkHTTP;\n")
         else:
-            self._proxy_location(f, proto, server_root_url)
+            self._proxy_location(f, proto, target_url)
         f.write('}\n')
 
         if self._signature:
-            f.write('location /@internal%s {\n' % location)
+            f.write('location ~^ /@internal%s {\n' % location)
             f.write('  internal;\n');
-            self._proxy_location(f, proto, server_root_url)
+            self._proxy_location(f, proto, target_url)
             f.write('}\n')
 
     def _proxy_location(self, f, proto, url):
@@ -95,7 +143,6 @@ class FileWriter(object):
         f.write('  proxy_set_header X-Forwarded-Proto %s ;\n' % proto)
         f.write('  proxy_set_header  X-Forwarded-For $remote_addr;\n')
         f.write('  proxy_set_header  X-Forwarded-Host $remote_addr;\n')
-        #f.write('  proxy_pass %s://streams_job_%s/;\n' % (proto, jobid))
         f.write('  proxy_pass %s;\n' % url)
 
         if proto == 'https':
