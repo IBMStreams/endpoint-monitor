@@ -41,7 +41,7 @@ def _make_port_alias(path, port, output=True):
     r += '/'
     r += str(port)
     r += '/'
-    alias = path.replace(r)
+    alias = path.replace(r, '')
     if alias != path:
         return path
 
