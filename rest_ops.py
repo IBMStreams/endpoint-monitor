@@ -35,21 +35,18 @@ def _find_contexts(server, url, client_cert):
 
     return contexts, oppaths, exposed_ports
 
-def _make_port_alias(path, port, output=True):
+def _make_port_alias(path, port, output):
     r = '/ports/'
     r += 'output' if output else 'input'
     r += '/'
     r += str(port)
     r += '/'
-    print('DDDD', 'PATH', path)
-    print('DDDD', 'REPL', r)
     alias = path.replace(r, '/')
-    print('DDDD', 'ALIAS', r)
     if alias != path:
         return alias
 
 def _add_alias(aliases, path, port, output=True):
-    alias = _make_port_alias(path, 0)
+    alias = _make_port_alias(path, 0, output)
     if alias:
         aliases[alias] = path
 
