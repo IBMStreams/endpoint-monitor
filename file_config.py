@@ -64,7 +64,39 @@ class FileWriter(object):
             proto = server.proto
             details = job_config.server_details[server]
             server_root_url = details.url
+ 
+            # The job is exposed as a single logical entry
+            # under location/*
 
+            # However the job may contain multiple REST endpoint
+            # operators in multiple servers. This is to avoid forcing
+            # unrelated operators into the same PE and hence same
+            # server. For example an inject operator should not be
+            # forced into a tuple view (expose) operator that
+            # is at the end of the analytic flow.
+
+            # This for example we may have operators of:
+            # C1/A  - Server S1
+            # C2/B  - Server S1
+            # C1/C  - Server S2
+            
+            # Thus we create proxy mappings as follows:
+
+            # Contexts that will resolve static files
+            # exposed by the operator(s)
+            # The assumption is that if a job is exposing a context
+            # and resource files then they files are consistent across
+            # operators.
+            # C1    ----> S1/C1
+            # C2    ----> S1/C2
+            # C1    ----> S2/C1
+
+            # Operator paths that will resolve paths specific
+            # to an individual operator's ports/streams
+            # C1/A  ----> S1/C1/A
+            # C2/B  ----> S1/C2/B
+            # C1/C  ----> S2/C1/C
+       
             if multi_servers:
                 for p in details.paths:
                     loc = location + p + '/'
