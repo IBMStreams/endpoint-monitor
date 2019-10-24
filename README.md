@@ -97,26 +97,18 @@ oc new-app \
 
 ## URL mapping
 
-Current support is limited to:
-
- * HTTP & HTTPS operators
- * Single web-server per job
-     * The web-server can be hosting multiple REST operators that are fused into a single PE
- * Port number should be zero or a non-system port.
-
 For a web-server in a job its URLs are exposed with prefix path:
 
  * *jobname*`/` - When a job name was explictly set. Job names should be simple mapping to a single path element.
  * `streams/jobs/`*jobid*`/` - When a job name was not explicitly set.
 
-The path is against the service *application-name*
+The path is against the service *application-name* (``${NAME}``)
  
 Example URLs within the cluster for *application-name* of `em` in project `myproject` are:
  
  * `https://em.myproject.svc:8443/transit/ports/info` with a web-server in job named `transit`:
  * `https://em.myproject.svc:8443/streams/jobs/7/ports/info` with a web-server in job 7:
  
-
 ## Implementation notes
 
 The template uses the nginx and python 3.6 source to image (s2i) setups to define two containers (nginx & python) within a single pod. The two containers share a local volume (`/opt/streams_job_configs`) and communicate through a named pipe on the volume.
