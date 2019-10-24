@@ -46,9 +46,9 @@ def _make_port_alias(path, port, output=True):
         return path
 
 def _add_alias(aliases, path, port, output=True):
-    alias = _make_port_alias(inject, 0)
+    alias = _make_port_alias(path, 0)
     if alias:
-        aliases[alias] = inject
+        aliases[alias] = path
 
 def _create_aliases(ports):
     aliases = {}
