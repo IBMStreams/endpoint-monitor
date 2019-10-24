@@ -35,7 +35,7 @@ def _find_contexts(server, url, client_cert):
 
     return contexts, oppaths, exposed_ports
 
-def _make_port_alias(path, port, output=True)
+def _make_port_alias(path, port, output=True):
     r = '/ports/'
     r += 'output' if output else 'input'
     r += '/'
