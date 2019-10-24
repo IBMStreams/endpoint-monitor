@@ -108,6 +108,12 @@ class FileWriter(object):
                     url = server_root_url + c + '/'
                     self._proxy_entry(f, loc, proto, url)
 
+            # Aliases to operator functional paths (e.g. inject)
+            for a,p in details.aliases.items():
+                loc = location + a 
+                url = server_root_url + p
+                self._proxy_entry(f, loc, proto, url)
+
         # A final catch all
         # Is the sole location for a single server
         # Maps to only one of the servers.

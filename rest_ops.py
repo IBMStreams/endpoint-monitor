@@ -41,7 +41,7 @@ def _make_port_alias(path, port, output=True):
     r += '/'
     r += str(port)
     r += '/'
-    alias = path.replace(r, '')
+    alias = path.replace(r, '/')
     if alias != path:
         return alias
 
@@ -52,9 +52,10 @@ def _add_alias(aliases, path, port, output=True):
 
 def _create_aliases(ports):
     aliases = {}
+    single = len(ports) == 1
     for port in ports:
         kind = port['operatorKind']
-        if kind == 'com.ibm.streamsx.inet.rest::HTTPJSONInjection':
+        if single and kind == 'com.ibm.streamsx.inet.rest::HTTPJSONInjection':
             cps = port['contextPaths']
             _add_alias(aliases, cps['inject'], 0)
 
@@ -70,6 +71,6 @@ def fill_in_details(endjob, client_cert):
         contexts, paths, ports = _find_contexts(server, url, client_cert)
         aliases = _create_aliases(ports)
         print('Aliases', aliases)
-        endjob.server_details[server] = endpoint_monitor.ServerDetail(url, contexts, paths, ports)
+        endjob.server_details[server] = endpoint_monitor.ServerDetail(url, contexts, paths, ports, aliases)
         print('Server', server)
         print('ServerDetail', endjob.server_details[server])
