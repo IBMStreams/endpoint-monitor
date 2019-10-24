@@ -60,7 +60,6 @@ class FileWriter(object):
 
         multi_servers = len(job_config.servers) > 1
         seen_contexts = set()
-
  
         for server in job_config.servers:
             proto = server.proto
@@ -105,7 +104,7 @@ class FileWriter(object):
                     self._proxy_entry(f, loc, proto, url)
 
                 for c in details.contexts:
-                    if not c in seen_contexts():
+                    if not c in seen_contexts:
                         loc = location + c + '/'
                         url = server_root_url + c + '/'
                         self._proxy_entry(f, loc, proto, url)
