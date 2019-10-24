@@ -49,8 +49,8 @@ class TestEmExpose(EmCommon):
 
         endpoint.expose(s.last(3), name=name, context=context, monitor=self._monitor)
 
-        self._path = '/' + context + '/' + name + '/ports/input/0/tuples';
-        self._alias = '/' + context + '/' + name + '/tuples';
+        self._path = '/' + context + '/' + name + '/ports/input/0/tuples'
+        self._alias = '/' + context + '/' + name + '/tuples'
 
         self.tester = Tester(topo)
         self.tester.local_check = self._access

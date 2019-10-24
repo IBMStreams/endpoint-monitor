@@ -54,8 +54,8 @@ class TestEmInject(EmCommon):
         s = endpoint.inject(topo, name=name, context=context, monitor=self._monitor)
         streamsx.spl.toolkit.add_toolkit(topo, TestEmInject._TK)
 
-        self._path = '/' + context + '/' + name + '/ports/output/0/inject';
-        self._alias = '/' + context + '/' + name + '/inject';
+        self._path = '/' + context + '/' + name + '/ports/output/0/inject'
+        self._alias = '/' + context + '/' + name + '/inject'
 
         self.tester = Tester(topo)
         self.tester.local_check = self._inject
@@ -90,7 +90,7 @@ class TestEmInject(EmCommon):
         else:
             s1.colocate(s2)
 
-        self._path = '/' + context + 'C1/' + name + 'N1/ports/output/0/inject';
+        self._path = '/' + context + 'C1/' + name + 'N1/ports/output/0/inject'
 
         self.tester = Tester(topo)
         self.tester.local_check = self._multi_inject
