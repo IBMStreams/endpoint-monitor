@@ -26,14 +26,15 @@ class TestEmExpose(EmCommon):
         self._wait_for_endpoint()
         time.sleep(2)
 
-        # switch between the full traditional URL and the alias created
-        # by the endpoint monitor
         url_full = self._job_url + self._path
-        url_alias = self._job_url + self._alias if self._alias else None
         resp = requests.get(url=url_full, verify=False)
-
         self.assertEqual(resp.status_code, 200, str(resp))
+        data = resp.json()
+        self.assertEqual(data, [{'seq': 17}, {'seq': 18}, {'seq': 19}])
 
+        url_alias = self._job_url + self._alias
+        resp = requests.get(url=url_alias, verify=False)
+        self.assertEqual(resp.status_code, 200, str(resp))
         data = resp.json()
         self.assertEqual(data, [{'seq': 17}, {'seq': 18}, {'seq': 19}])
 
@@ -49,7 +50,7 @@ class TestEmExpose(EmCommon):
         endpoint.expose(s.last(3), name=name, context=context, monitor=self._monitor)
 
         self._path = '/' + context + '/' + name + '/ports/input/0/tuples';
-        #self._alias = '/' + context + '/' + name + '/tuples';
+        self._alias = '/' + context + '/' + name + '/tuples';
 
         self.tester = Tester(topo)
         self.tester.local_check = self._access

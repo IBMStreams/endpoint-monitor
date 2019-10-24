@@ -58,6 +58,13 @@ def _create_aliases(ports):
         if single and kind == 'com.ibm.streamsx.inet.rest::HTTPJSONInjection':
             cps = port['contextPaths']
             _add_alias(aliases, cps['inject'], 0)
+        elif single and kind == 'com.ibm.streamsx.inet.rest::HTTPTupleInjection':
+            cps = port['contextPaths']
+            _add_alias(aliases, cps['inject'], 0)
+            _add_alias(aliases, cps['form'], 0)
+        elif single and kind == 'com.ibm.streamsx.inet.rest::HTTPTupleView':
+            cps = port['contextPaths']
+            _add_alias(aliases, cps['tuples'], 0, output=False)
 
     return aliases
     
