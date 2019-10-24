@@ -18,53 +18,15 @@ import requests
 import time
 import shutil
 
-def _rand_path():
-    return ''.join(random.choices(string.ascii_uppercase, k=12))
-  
-class TestEmInject(unittest.TestCase):
-    _multiprocess_can_split_ = True
-    _TK = None
+from em_common import EmCommon, _rand_path
 
-    @classmethod
-    def setupClass(cls):
-        TestEmInject._TK = endpoint.download_toolkit()
-
-    @classmethod
-    def tearDownClass(cls):
-        if TestEmInject._TK:
-            shutil.rmtree(TestEmInject._TK)
+class TestEmInject(EmCommon):
 
     def setUp(self):
-        Tester.setup_distributed(self)
-        self._base_url = os.environ['ENDPOINT_MONITOR']
-        self._job_name = None
-        self._monitor = os.environ.get('ENDPOINT_NAME')
-        self._alias = None
+        super(TestEmInject, self).setUp()
         self.N = 163
         self.K = 'seq'
 
-    def _set_job_url(self):
-        job = self.tester.submission_result.job
-        if self._job_name:
-            self._job_url = self._base_url + '/' + self._job_name
-        else:
-            self._job_url = self._base_url + '/streams/jobs/' + str(job.id)
-        print('JOB URL', self._job_url)
-
-    def _wait_for_endpoint(self):
-        url = self._job_url + '/ports/info'
-        for i in range(100):
-            rc = requests.get(url=url, verify=False)
-            if rc.status_code == 200:
-                 print('JOB is monitored', self._job_url)
-                 return
-            time.sleep(2)
-        self.fail("Job not being monitored:" + self._job_url)
-
-    def _check_no_endpoint(self):
-        url = self._job_url + '/ports/info'
-        rc = requests.get(url=url, verify=False)
-    
     def _inject(self):
         self._set_job_url()
         self._wait_for_endpoint()
