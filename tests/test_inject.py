@@ -39,6 +39,7 @@ class TestEmInject(unittest.TestCase):
         self._base_url = os.environ['ENDPOINT_MONITOR']
         self._job_name = None
         self._monitor = os.environ.get('ENDPOINT_NAME')
+        self._alias = None
         self.N = 163
         self.K = 'seq'
 
@@ -68,9 +69,13 @@ class TestEmInject(unittest.TestCase):
         self._set_job_url()
         self._wait_for_endpoint()
 
-        url = self._job_url + self._path
+        # switch between the full traditional URL and the alias created
+        # by the endpoint monitor
+        url_full = self._job_url + self._path
+        url_alias = self._job_url + self._alias if self._alias else None
         for i in range(self.N):
             data = {self.K: i}
+            url = url_alias if url_alias and i % 2 == 0 else url_full
             rc = requests.post(url=url, json=data, verify=False)
             self.assertEqual(rc.status_code, 204, str(rc))
 
@@ -93,6 +98,7 @@ class TestEmInject(unittest.TestCase):
         streamsx.spl.toolkit.add_toolkit(topo, TestEmInject._TK)
 
         self._path = '/' + context + '/' + name + '/ports/output/0/inject';
+        self._alias = '/' + context + '/' + name + '/inject';
 
         self.tester = Tester(topo)
         self.tester.local_check = self._inject

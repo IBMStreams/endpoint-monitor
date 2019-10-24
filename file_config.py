@@ -59,7 +59,8 @@ class FileWriter(object):
         f.write('}\n')
 
         multi_servers = len(job_config.servers) > 1
-
+        seen_contexts = set()
+ 
         for server in job_config.servers:
             proto = server.proto
             details = job_config.server_details[server]
@@ -89,7 +90,6 @@ class FileWriter(object):
             # operators.
             # C1    ----> S1/C1
             # C2    ----> S1/C2
-            # C1    ----> S2/C1
 
             # Operator paths that will resolve paths specific
             # to an individual operator's ports/streams
@@ -104,9 +104,17 @@ class FileWriter(object):
                     self._proxy_entry(f, loc, proto, url)
 
                 for c in details.contexts:
-                    loc = location + c + '/'
-                    url = server_root_url + c + '/'
-                    self._proxy_entry(f, loc, proto, url)
+                    if not c in seen_contexts:
+                        loc = location + c + '/'
+                        url = server_root_url + c + '/'
+                        self._proxy_entry(f, loc, proto, url)
+                        seen_contexts.add(c)
+
+            # Aliases to operator functional paths (e.g. inject)
+            for a,p in details.aliases.items():
+                loc = location + a.replace('/','',1) 
+                url = server_root_url + p.replace('/','',1)
+                self._proxy_entry(f, loc, proto, url)
 
         # A final catch all
         # Is the sole location for a single server
