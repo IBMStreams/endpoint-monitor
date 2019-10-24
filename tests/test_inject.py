@@ -2,8 +2,6 @@
 # Licensed Materials - Property of IBM
 # Copyright IBM Corp. 2019
 
-import random
-import string
 import unittest
 
 from streamsx.topology.topology import Topology
@@ -12,11 +10,8 @@ from streamsx.topology.tester import Tester
 import streamsx.endpoint as endpoint
 import streamsx.spl.toolkit
 
-import queue
 import os
 import requests
-import time
-import shutil
 
 from em_common import EmCommon, _rand_path
 

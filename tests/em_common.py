@@ -6,13 +6,9 @@ import random
 import string
 import unittest
 
-from streamsx.topology.topology import Topology
-from streamsx.topology.context import JobConfig
 from streamsx.topology.tester import Tester
 import streamsx.endpoint as endpoint
-import streamsx.spl.toolkit
 
-import queue
 import os
 import requests
 import time
