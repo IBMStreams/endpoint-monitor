@@ -17,6 +17,10 @@ import requests
 
 from em_common import EmCommon, _rand_path
 
+#
+# Verify the params passed to an SPL work as documented.
+#
+
 class TestEmSPL(EmCommon):
 
     def setUp(self):
@@ -34,9 +38,7 @@ class TestEmSPL(EmCommon):
         params['port'] = 0
         params['context'] = context
         if self._monitor:
-            params['sslAppConfigName'] = self._monitor + '-stream-certs'
-
-        print('DDDD', params)
+            params['sslAppConfigName'] = self._monitor + '-streams-certs'
 
         inject = op.Source(topo, 'com.ibm.streamsx.inet.rest::HTTPTupleInjection', schema, params, name)
 
@@ -62,9 +64,7 @@ class TestEmSPL(EmCommon):
 
         data = {'a':42, 'b':'HHGTTG', 'c':True}
 
-        print('DDD', url_full)
         rc = requests.post(url=url_full, data=data, verify=False)
-        print('DDD', rc)
         self.assertEqual(rc.status_code, 204, str(rc))
 
         data = {'a':93, 'b':'ABCDE', 'c':False}
