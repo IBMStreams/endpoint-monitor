@@ -35,7 +35,12 @@ positions = endpoint.inject(topo, context='vehicles', name='position', monitor='
 
 ### SPL applications
 
-TBD
+Endpoints are instances of the REST operators from the [com.ibm.streamsx.inetserver](https://ibmstreams.github.io/streamsx.inetserver/) toolkit.
+
+The operators should be configured with these parameters:
+ * `port: 0`
+ * `context:` *context*
+ * `sslAppConfigName:` *${NAME}*`-streams-certs` - Optional - set if connections between the endpoint-monitor and the Streams endpoints must use HTTPS/SSL. `${NAME}` is the name of the endpoint-monitor application, see Setup.
 
 ## Setup
 
