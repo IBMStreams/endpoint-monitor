@@ -137,14 +137,17 @@ class TestEmInject(EmCommon):
         # by the endpoint monitor
         url_full = self._job_url + self._path
         url_alias = self._job_url + self._alias
+        url_form = url_alias[0:-1*len('/inject')] + '/form'
 
         data = {'a':42, 'b':'HHGTTG', 'c':True}
 
         rc = requests.post(url=url_full, data=data, verify=False)
-        print('DDD', 'FULL', rc)
         self.assertEqual(rc.status_code, 204, str(rc))
 
         data = {'a':93, 'b':'ABCDE', 'c':False}
         rc = requests.post(url=url_alias, data=data, verify=False)
-        print('DDD', 'ALIAS', rc)
         self.assertEqual(rc.status_code, 204, str(rc))
+
+        rc = requests.get(url=url_form, verify=False)
+        self.assertEqual(rc.status_code, 200, str(rc))
+
