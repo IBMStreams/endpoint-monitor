@@ -88,7 +88,7 @@ if os.path.exists(server_pass):
     LOGGER.info("Created Streams application configuration for endpoints: %s", app_cfg_name)
 
 
-active_file os.path.join(OPT, 'monitor.active')
+active_file = os.path.join(OPT, 'monitor.active')
 with open(active_file, 'w') as f:
     f.write(time.asctime())
     f.write("\n")
