@@ -264,6 +264,20 @@
                   {"name": "streams-certs", "mountPath": "/var/run/secrets/streams-endpoint-monitor/streams-certs", "readOnly":true, "optional":true},
                   {"name": "server-auth", "mountPath": "/var/run/secrets/streams-endpoint-monitor/server-auth", "readOnly":true}
                 ],
+                "readinessProbe": {
+                  "timeoutSeconds": 1,
+                  "initialDelaySeconds": 3,
+                  "exec": {
+                    "command": [ "/bin/cat", "/var/opt/streams-endpoint-monitor/monitor.active" ]
+                  }
+                },
+                "livenessProbe": {
+                    "timeoutSeconds": 1,
+                    "initialDelaySeconds": 10,
+                     "exec": {
+                        "command": [ "/bin/cat", "/var/opt/streams-endpoint-monitor/monitor.active" ]
+                  }
+                },
                 "resources": {
                     "limits": {
                         "memory": "${MEMORY_LIMIT}"
