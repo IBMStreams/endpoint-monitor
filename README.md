@@ -32,7 +32,7 @@ import streamsx.endpoint as endpoint
 
 topo = Topology()
 
-positions = endpoint.inject(topo, context='vehicles', name='position', monitor='streams-em')
+positions = endpoint.inject(topo, context='vehicles', name='position', monitor='buses-em')
 ```
 
 ### SPL applications
@@ -59,9 +59,20 @@ Endpoint-monitor creates shortened paths for these operators in `com.ibm.streams
 * `HTTPTupleView`
    * *context*/*name*/`tuples` - Access to tuples exposed by the operator
 
-For example with an endpoint-monitor name `em` this is the URL  for an injection endpoint with context `buses`, name `locations` in in job named `transit`:
+For example with an endpoint-monitor name `buses-em` this is the URL  for an injection endpoint with context `buses`, name `locations` in in job named `transit`:
 
-``https://em.myproject.svc:8443/transit/buses/locations/inject``
+``https://buses-em.myproject.svc:8443/transit/buses/locations/inject``
+
+The corresponding SPL code for the operator would be:
+
+```
+stream<Json> locations = com.ibm.streamsx.inet.rest::HTTPJSONInjection() {
+    param
+       port: 0;
+       context: 'buses';
+       sslAppConfigName: 'buses-em-streams-certs';
+}
+```
 
 ## Setup
 
@@ -130,11 +141,11 @@ For a web-server in a job its URLs are exposed with prefix path:
 
 The path is against the service *application-name* (``${NAME}``)
  
-Example URLs within the cluster for *application-name* of `em` in project `myproject` are:
+Example URLs within the cluster for *application-name* of `buses-em` in project `myproject` are:
  
- * `https://em.myproject.svc:8443/transit/ports/info`for a job named `transit`:
- * `https://em.myproject.svc:8443/streams/jobs/7/ports/info` for job 7 without an explicitly set job name:
- * `https://em.myproject.svc:8443/transit/buses/locations/inject` for an injection endpoint with context `buses`, name `locations` in in job named `transit`.
+ * `https://buses-em.myproject.svc:8443/transit/ports/info`for a job named `transit`:
+ * `https://buses-em.myproject.svc:8443/streams/jobs/7/ports/info` for job 7 without an explicitly set job name:
+ * `https://buses-em.myproject.svc:8443/transit/buses/locations/inject` for an injection endpoint with context `buses`, name `locations` in in job named `transit`.
  
 ## Implementation notes
 
