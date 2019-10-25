@@ -3,11 +3,14 @@
 
 import collections
 import time
+import logging
 import os
 import streamsx.rest as sxr
 import streamsx.rest_primitives as srp
 
 import rest_ops
+
+LOGGER = logging.getLogger('streamsx.endpoint_monitor')
 
 Server = collections.namedtuple('Server', ['proto', 'ip', 'port', 'pe_id'])
 
@@ -88,7 +91,6 @@ def _job_update(job_info, j):
             # PE does not contain any rest operators, thus don't care about it, go onto next PE
             continue
         if job_info.pes[pe.id] == pe.launchCount:
-            print("SAME LAUNCHCOUNT")
             # Check if this PE has any existing servers
             if not _check_if_server_in_pe(job_info, pe.id):
                 # PE launchCount same, and no servers in this PE, thus server just starting up, check if it is up and running
@@ -101,7 +103,6 @@ def _job_update(job_info, j):
                             servers_to_add.add(new_server)
                             break
         else:
-            print("DIFFERENT LAUNCHCOUNT")
             # PE launchCount different, thus PE restarted, iterate through the op names in this PE
             # For each op name, get the actual op object and check if new server is up
             for op_name in op_names:
@@ -144,6 +145,7 @@ class EndpointMonitor(object):
         self._client_cert = client_cert
         self._verify = verify
         self._inst = None
+        self._last_report = time.time()
 
     @property
     def instance(self):
@@ -178,16 +180,15 @@ class EndpointMonitor(object):
                     jobs[j.id] = _job_update(job_info, j)
                     continue
 
-            print("CREATING NEW JOB")
             # New job, or job has changed (new generationId) - maybe now has a rest operator?
             jobs[j.id] = _job_new_incarnation(j)
         return jobs
 
     def _update(self):
-        print("Scan for jobs")
+        LOGGER.debug("Scan for jobs")
         current_jobs = self._survey_jobs()
         existing_jobs = list(self._jobs.keys())
-        print("Existing jobs", existing_jobs)
+        LOGGER.debug("Existing jobs", existing_jobs)
         for jobid in existing_jobs:
             # Check if existing job is still running
             ne = current_jobs.pop(jobid, None)
@@ -200,13 +201,13 @@ class EndpointMonitor(object):
             self._new_job(jobid, current_jobs[jobid])
 
     def _delete_job(self, jobid):
-        print("DELETE:", jobid, self._jobs[jobid])
+        LOGGER.info("Job %s cancelled: %s", jobid, self._jobs[jobid])
         if self._jobs[jobid].servers:
             self._config.delete(jobid, self._jobs[jobid])
         del self._jobs[jobid]
 
     def _update_job(self, jobid, ne):
-        print("UPDATE:", jobid, ne)
+        LOGGER.info("Job %s updated: %s", jobid, ne)
         if ne.servers:
             rest_ops.fill_in_details(ne, self._client_cert)
             self._config.update(jobid, self._jobs[jobid], ne)
@@ -214,7 +215,7 @@ class EndpointMonitor(object):
 
     # ne is the jobid's job_info
     def _new_job(self, jobid, ne):
-        print("NEW:", jobid, ne, bool(ne.servers))
+        LOGGER.info("Job %s submitted: %s", jobid, ne)
         if ne.servers:
             rest_ops.fill_in_details(ne, self._client_cert)
             self._config.create(jobid, ne)
@@ -228,7 +229,7 @@ class EndpointMonitor(object):
                  time.sleep(5)
             except IOError as e:
                  self._inst = None
-                 print("ERROR", e)
+                 LOGGER.exception("Error communicating with Streams", e)
                  time.sleep(1)
 
 class EndpointJob:

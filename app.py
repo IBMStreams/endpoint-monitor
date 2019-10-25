@@ -1,3 +1,7 @@
+# Licensed Materials - Property of IBM
+# Copyright IBM Corp. 2019
+
+import logging
 import os
 import re
 import subprocess
@@ -7,6 +11,8 @@ from file_config import FileWriter
 from endpoint_monitor import EndpointMonitor
 import app_config_certs
 import streams_openshift
+
+LOGGER = logging.getLogger('streamsx.endpoint_monitor.app')
 
 OPT = '/var/opt/streams-endpoint-monitor'
 SECRETS = '/var/run/secrets/streams-endpoint-monitor'
@@ -43,7 +49,7 @@ def _process_streams_certs():
 
 def _has_signature_secret():
     sig_file = os.path.join(SECRETS, 'server-auth', 'signature-secret')
-    print('Signature secret file', sig_file, os.path.exists(sig_file))
+    LOGGER.info('Signature secret file: %s exists %s', sig_file, os.path.exists(sig_file))
     return os.path.exists(sig_file)
 
 info.main()
@@ -55,13 +61,13 @@ sws_service = streams_openshift.get_sws_service(instance_name)
 if not sws_service:
     raise ValueError("Cannot find Streams SWS service for instance {0}".format(instance_name))
     
-print("IBMStreamsInstance:", instance_name)
-print("SWS Service:", sws_service)
+LOGGER.info("IBMStreamsInstance: %s", instance_name)
+LOGGER.info("SWS Service: %s", sws_service)
 
 job_group_pattern = os.environ['STREAMSX_ENDPOINT_JOB_GROUP']
 #job_filter = lambda job : re.match(job_group_pattern, job.jobGroup)
 job_filter = lambda job : job.jobGroup.endswith('/'+job_group_pattern)
-print("Job group pattern:", job_group_pattern)
+LOGGER.info("Job group pattern: %s", job_group_pattern)
 
 client_cert = _process_streams_certs()
 
