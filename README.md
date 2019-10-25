@@ -15,12 +15,14 @@ The endpoints from the REST operators are then exposed with fixed URLs through a
 
 ## Streams application endpoints
 
+The Streams application containing endpoints must be submitted to a job group that the endpoint-monitor is configured to monitor. See Setup.
+
 ### Python topology applications
 
 Endpoints are supported by the `streamsx.endpoint` package, installable from pip:
 
    * PyPi - https://pypi.org/project/streamsx.endpoint/
-   * Documentation - https://streamsxendpoint.readthedocs.io/en/1.0.0/
+   * Documentation - https://streamsxendpoint.readthedocs.io/en/1.0.1/
    
 Example of an application endpoint that supports HTTP POST requests that insert the body of the POST as JSON into the stream as a single tuple.
 
@@ -38,9 +40,28 @@ positions = endpoint.inject(topo, context='vehicles', name='position', monitor='
 Endpoints are instances of the REST operators from the [com.ibm.streamsx.inetserver](https://ibmstreams.github.io/streamsx.inetserver/) toolkit.
 
 The operators should be configured with these parameters:
- * `port: 0`
- * `context:` *context*
+ * `port: 0` - Uses a port from the ephemeral range, ensures multiple rest operators within the same PE share a Jetty server.
+ * `context:` *context* - Context lead in for the exposed paths. Ensures the paths remain fixed regardless of SPL application changes, such as refactoring into multiple composites.
  * `sslAppConfigName:` *${NAME}*`-streams-certs` - Optional - set if connections between the endpoint-monitor and the Streams endpoints must use HTTPS/SSL. `${NAME}` is the name of the endpoint-monitor application, see Setup.
+
+All REST operators within the application must use the same settings for `port` (0) and `sslAppConfigName` which ensures
+operators fused into the same PE share a single Jetty server. Only a single Jetty server is supported per-PE.
+
+Multiple Jetty servers within the same job are supported, by means of the REST operators being in multiple PEs. Thus for example an injection operator as the source of the application need not be fused with an instance of `HTTPTupleView` at the end of the graph.
+
+Endpoint-monitor creates shortened paths for these operators in `com.ibm.streamsx.inet.rest` namespace:
+
+* `HTTPJSONInjection`
+   * *context*/*name*/`inject` - Injection of tuples to output port 0
+* `HTTPTupleInjection`
+   * *context*/*name*/`inject` - Injection of tuples to output port 0
+   * *context*/*name*/`form` - Simple HTML form to injecti tuples to output port 0
+* `HTTPTupleView`
+   * *context*/*name*/`tuples` - Access to tuples exposed by the operator
+
+For example with an endpoint-monitor name `em` this is the URL  for an injection endpoint with context `buses`, name `locations` in in job named `transit`:
+
+``https://em.myproject.svc:8443/transit/buses/locations/inject``
 
 ## Setup
 
@@ -111,8 +132,9 @@ The path is against the service *application-name* (``${NAME}``)
  
 Example URLs within the cluster for *application-name* of `em` in project `myproject` are:
  
- * `https://em.myproject.svc:8443/transit/ports/info` with a web-server in job named `transit`:
- * `https://em.myproject.svc:8443/streams/jobs/7/ports/info` with a web-server in job 7:
+ * `https://em.myproject.svc:8443/transit/ports/info`for a job named `transit`:
+ * `https://em.myproject.svc:8443/streams/jobs/7/ports/info` for job 7 without an explicitly set job name:
+ * `https://em.myproject.svc:8443/transit/buses/locations/inject` for an injection endpoint with context `buses`, name `locations` in in job named `transit`.
  
 ## Implementation notes
 
