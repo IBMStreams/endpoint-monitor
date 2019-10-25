@@ -1,5 +1,10 @@
+# Licensed Materials - Property of IBM
+# Copyright IBM Corp. 2019
+
+import logging
 import os
 import re
+import time
 import subprocess
 import streamsx.scripts.info as info
 
@@ -7,6 +12,10 @@ from file_config import FileWriter
 from endpoint_monitor import EndpointMonitor
 import app_config_certs
 import streams_openshift
+
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+
+LOGGER = logging.getLogger('streamsx.endpoint_monitor.app')
 
 OPT = '/var/opt/streams-endpoint-monitor'
 SECRETS = '/var/run/secrets/streams-endpoint-monitor'
@@ -43,7 +52,7 @@ def _process_streams_certs():
 
 def _has_signature_secret():
     sig_file = os.path.join(SECRETS, 'server-auth', 'signature-secret')
-    print('Signature secret file', sig_file, os.path.exists(sig_file))
+    LOGGER.info('Signature secret file: %s exists %s', sig_file, os.path.exists(sig_file))
     return os.path.exists(sig_file)
 
 info.main()
@@ -55,13 +64,13 @@ sws_service = streams_openshift.get_sws_service(instance_name)
 if not sws_service:
     raise ValueError("Cannot find Streams SWS service for instance {0}".format(instance_name))
     
-print("IBMStreamsInstance:", instance_name)
-print("SWS Service:", sws_service)
+LOGGER.info("IBMStreamsInstance: %s", instance_name)
+LOGGER.info("SWS Service: %s", sws_service)
 
 job_group_pattern = os.environ['STREAMSX_ENDPOINT_JOB_GROUP']
 #job_filter = lambda job : re.match(job_group_pattern, job.jobGroup)
 job_filter = lambda job : job.jobGroup.endswith('/'+job_group_pattern)
-print("Job group pattern:", job_group_pattern)
+LOGGER.info("Job group pattern: %s", job_group_pattern)
 
 client_cert = _process_streams_certs()
 
@@ -73,7 +82,18 @@ em = EndpointMonitor(endpoint=sws_service, config=cfg, job_filter=job_filter, cl
 certs_secret = os.path.join(SECRETS, 'streams-certs')
 server_pass = os.path.join(certs_secret, 'server.pass')
 if os.path.exists(server_pass):
+    LOGGER.info("HTTPS endpoints supported:")
     app_cfg_name = os.environ['STREAMSX_ENDPOINT_NAME'] + '-streams-certs'
     app_config_certs.create_app_config(em.instance, app_cfg_name, certs_secret)
+    LOGGER.info("Created Streams application configuration for endpoints: %s", app_cfg_name)
 
-em.run()
+
+active_file = os.path.join(OPT, 'monitor.active')
+with open(active_file, 'w') as f:
+    f.write(time.asctime())
+    f.write("\n")
+
+try:
+    em.run()
+finally:
+    os.remove(active_file)
