@@ -12,6 +12,8 @@ from endpoint_monitor import EndpointMonitor
 import app_config_certs
 import streams_openshift
 
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+
 LOGGER = logging.getLogger('streamsx.endpoint_monitor.app')
 
 OPT = '/var/opt/streams-endpoint-monitor'
