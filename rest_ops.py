@@ -35,7 +35,7 @@ def _find_contexts(server, url, client_cert):
 
     return contexts, oppaths, exposed_ports
 
-def _make_port_alias(path, port, output=True):
+def _make_port_alias(path, port, output):
     r = '/ports/'
     r += 'output' if output else 'input'
     r += '/'
@@ -46,18 +46,24 @@ def _make_port_alias(path, port, output=True):
         return alias
 
 def _add_alias(aliases, path, port, output=True):
-    alias = _make_port_alias(path, 0)
+    alias = _make_port_alias(path, 0, output)
     if alias:
         aliases[alias] = path
 
 def _create_aliases(ports):
     aliases = {}
-    single = len(ports) == 1
     for port in ports:
         kind = port['operatorKind']
-        if single and kind == 'com.ibm.streamsx.inet.rest::HTTPJSONInjection':
+        if kind == 'com.ibm.streamsx.inet.rest::HTTPJSONInjection':
             cps = port['contextPaths']
             _add_alias(aliases, cps['inject'], 0)
+        elif kind == 'com.ibm.streamsx.inet.rest::HTTPTupleInjection':
+            cps = port['contextPaths']
+            _add_alias(aliases, cps['inject'], 0)
+            _add_alias(aliases, cps['form'], 0)
+        elif kind == 'com.ibm.streamsx.inet.rest::HTTPTupleView':
+            cps = port['contextPaths']
+            _add_alias(aliases, cps['tuples'], 0, output=False)
 
     return aliases
     

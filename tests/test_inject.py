@@ -6,6 +6,7 @@ import unittest
 
 from streamsx.topology.topology import Topology
 from streamsx.topology.context import JobConfig
+from streamsx.topology.schema import StreamSchema
 from streamsx.topology.tester import Tester
 import streamsx.endpoint as endpoint
 import streamsx.spl.toolkit
@@ -54,8 +55,8 @@ class TestEmInject(EmCommon):
         s = endpoint.inject(topo, name=name, context=context, monitor=self._monitor)
         streamsx.spl.toolkit.add_toolkit(topo, TestEmInject._TK)
 
-        self._path = '/' + context + '/' + name + '/ports/output/0/inject';
-        self._alias = '/' + context + '/' + name + '/inject';
+        self._path = '/' + context + '/' + name + '/ports/output/0/inject'
+        self._alias = '/' + context + '/' + name + '/inject'
 
         self.tester = Tester(topo)
         self.tester.local_check = self._inject
@@ -90,7 +91,7 @@ class TestEmInject(EmCommon):
         else:
             s1.colocate(s2)
 
-        self._path = '/' + context + 'C1/' + name + 'N1/ports/output/0/inject';
+        self._path = '/' + context + 'C1/' + name + 'N1/ports/output/0/inject'
 
         self.tester = Tester(topo)
         self.tester.local_check = self._multi_inject
@@ -108,3 +109,42 @@ class TestEmInject(EmCommon):
         self.K = 'seq2'
         self._path = self._path.replace('N1/', 'N2/').replace('C1/', 'C2/')
         self._inject()
+
+    def test_form_inject(self):
+        topo = Topology()
+        context = _rand_path()
+        name = _rand_path()
+        schema = StreamSchema('tuple<int32 a, rstring b, boolean c>')
+        s = endpoint.inject(topo, name=name, context=context, monitor=self._monitor, schema=schema)
+        streamsx.spl.toolkit.add_toolkit(topo, TestEmInject._TK)
+
+        self._path = '/' + context + '/' + name + '/ports/output/0/inject'
+        self._alias = '/' + context + '/' + name + '/inject'
+
+        self.tester = Tester(topo)
+        self.tester.local_check = self._form_inject
+        s.print()
+        self.tester.contents(s, [{'a':42, 'b':'HHGTTG', 'c':True}, {'a':93, 'b':'ABCDE', 'c':False}])
+        self.tester.test(self.test_ctxtype, self.test_config)
+
+        self._check_no_endpoint()
+
+    def _form_inject(self):
+        self._set_job_url()
+        self._wait_for_endpoint()
+
+        # switch between the full traditional URL and the alias created
+        # by the endpoint monitor
+        url_full = self._job_url + self._path
+        url_alias = self._job_url + self._alias
+
+        data = {'a':42, 'b':'HHGTTG', 'c':True}
+
+        rc = requests.post(url=url_full, data=data, verify=False)
+        print('DDD', 'FULL', rc)
+        self.assertEqual(rc.status_code, 204, str(rc))
+
+        data = {'a':93, 'b':'ABCDE', 'c':False}
+        rc = requests.post(url=url_alias, data=data, verify=False)
+        print('DDD', 'ALIAS', rc)
+        self.assertEqual(rc.status_code, 204, str(rc))
