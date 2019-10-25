@@ -10,7 +10,7 @@ import streamsx.rest_primitives as srp
 
 import rest_ops
 
-LOGGER = logging.getLogger('streamsx.endpoint_monitor')
+LOGGER = logging.getLogger(__name__)
 
 Server = collections.namedtuple('Server', ['proto', 'ip', 'port', 'pe_id'])
 
@@ -215,22 +215,30 @@ class EndpointMonitor(object):
 
     # ne is the jobid's job_info
     def _new_job(self, jobid, ne):
-        LOGGER.info("Job %s submitted: %s", jobid, ne)
         if ne.servers:
+            LOGGER.info("Job %s monitored: %s", jobid, ne)
             rest_ops.fill_in_details(ne, self._client_cert)
             self._config.create(jobid, ne)
+        else:
+            LOGGER.info("Job %s submitted with no endpoints: %s", jobid, ne)
         self._jobs[jobid] = ne
 
     def run(self):
+        error_count = 0
         self._config.clean()
         while True:
             try:
                  self._update()
+                 error_count = 0
                  time.sleep(5)
             except IOError as e:
                  self._inst = None
-                 LOGGER.exception("Error communicating with Streams", e)
+                 LOGGER.exception("Error communicating with Streams")
+                 error_count += 1
+                 if error_count > 60:
+                     break
                  time.sleep(1)
+        raise Exception("Failed to establish connection with Streams SWS service")
 
 class EndpointJob:
     def __init__(self, name, generationId, applicationName, servers, ops, pes, ops_in_pe):
@@ -244,4 +252,4 @@ class EndpointJob:
         self.ops_in_pe = ops_in_pe # Dictionary mapping a PE.id to a list of the names of rest operators, that given PE contains (ie ops_in_pe[pe_id] = [op1_name, op2_name])
 
     def __str__(self):
-        return "servers=%s, ops=%s, pes=%s" % (self.servers, self.ops, self.pes)
+        return "name=%s servers=%s, details=%s, ops=%s, pes=%s, application=%s" % (self.name, self.servers, self.server_details.values(), self.ops, self.pes, self.applicationName)

@@ -13,10 +13,8 @@ class FileWriter(object):
         self._pipe_name = os.path.join(location, 'actions')
         
     def _reload(self):
-        print('Monitor', 'RELOAD!')
         with open(self._pipe_name, 'w') as f:
             f.write('reload\n')
-        print('Monitor', 'RELOADED!')
 
     def clean(self):
         # Remove all nginx-streams-job-%s.conf

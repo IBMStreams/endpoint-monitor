@@ -76,7 +76,4 @@ def fill_in_details(endjob, client_cert):
         url = server_url(server)
         contexts, paths, ports = _find_contexts(server, url, client_cert)
         aliases = _create_aliases(ports)
-        print('Aliases', aliases)
         endjob.server_details[server] = endpoint_monitor.ServerDetail(url, contexts, paths, ports, aliases)
-        print('Server', server)
-        print('ServerDetail', endjob.server_details[server])

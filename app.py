@@ -4,6 +4,7 @@
 import logging
 import os
 import re
+import time
 import subprocess
 import streamsx.scripts.info as info
 
@@ -81,7 +82,18 @@ em = EndpointMonitor(endpoint=sws_service, config=cfg, job_filter=job_filter, cl
 certs_secret = os.path.join(SECRETS, 'streams-certs')
 server_pass = os.path.join(certs_secret, 'server.pass')
 if os.path.exists(server_pass):
+    LOGGER.info("HTTPS endpoints supported:")
     app_cfg_name = os.environ['STREAMSX_ENDPOINT_NAME'] + '-streams-certs'
     app_config_certs.create_app_config(em.instance, app_cfg_name, certs_secret)
+    LOGGER.info("Created Streams application configuration for endpoints: %s", app_cfg_name)
 
-em.run()
+
+active_file os.path.join(OPT, 'monitor.active')
+with open(active_file, 'w') as f:
+    f.write(time.asctime())
+    f.write("\n")
+
+try:
+    em.run()
+finally:
+    os.remove(active_file)
