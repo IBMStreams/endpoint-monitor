@@ -32,7 +32,7 @@ function checkSignature(r) {
     var secret_key = r.variables.signatureSecret;
     var signature = r.headersIn['x-signature'];
 
-    var digest = require('crypto').createHmac('sha1', secret_key).update(JSON.stringify(reqBody)).digest('hex');
+    var digest = require('crypto').createHmac('sha1', secret_key).update(reqBody).digest('hex');
 
     if (signature === digest) {
         // Authorized
