@@ -3,7 +3,7 @@
 
 In endpoint-monitor, for each job we care about, we create, update and delete Nginx configurations dynamically.
 At startup time, if there is a signature-secret located at `/var/run/secrets/streams-endpoint-monitor/server-auth/signature-secret`, the function `_has_signature_secret()` in `app.py` will set the boolean value `self._signature` to true in `file_config.py`
-(which writes each job’s Nginx config), and the signature verification call `js_content checkHTTP;` will be added to each job’s Nginx configuration. 
+(which writes each job’s Nginx config), and thus the signature verification call `js_content checkHTTP;` will be added to each job’s Nginx configuration. 
 
 Thus:
 
