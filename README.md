@@ -113,14 +113,9 @@ parameter when invoking `oc new-app`.
 
 ### 3. Endpoint service authentication
 
-Optional - Create a kubernetes generic secret that defines authentication for the endpoint-monitor service.
+Optional - Create a kubernetes generic secret that defines authentication for the endpoint-monitor service to limit who can input data into your endpoints
 
-The name of the secret is `${NAME}-authentication` e.g. `buses-em-authentication`.
-
-For signature verification of POST, PUT, PATCH requests create the property `signature-secret` with the value of secret.
-(See #8 for details of signature).
-
-<img width="394" alt="image" src="https://user-images.githubusercontent.com/3769612/65935654-b6229a80-e3ce-11e9-92ff-a13ace0f7cf6.png">
+Click here to see details on [enabling signature authentication](https://github.com/IBMStreams/endpoint-monitor/blob/master/docs/signature_auth.md)
 
 ### 4. Define HTTPS certificates
 
@@ -173,3 +168,5 @@ The python container monitors the Streams instance using the REST api through it
 
 
 The nginx container runs nginx pulling configuration from job endpoint `/opt/streams_job_configs/*.conf`. It also has a shell script that monitors the named pipe and executes its actions using `nginx -s`, e.g. `nginx -s reload`. (currently only `reload` is sent as an action).
+
+Click here to see the internal details on how [signature authentication](https://github.com/IBMStreams/endpoint-monitor/blob/master/docs/internal/signature_verification.md) works
