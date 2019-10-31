@@ -1,4 +1,4 @@
-# Signature Verification
+# Internal details for Signature Verification
 
 
 In endpoint-monitor, for each job we care about, we create, update and delete Nginx configurations dynamically.
