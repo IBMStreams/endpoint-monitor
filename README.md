@@ -113,9 +113,21 @@ parameter when invoking `oc new-app`.
 
 ### 3. Endpoint service authentication
 
-Optional - Create a kubernetes generic secret that defines authentication for the endpoint-monitor service to limit who can input data into your endpoints
+By default the endpoint-monitor's RESTful service **does not require authentication**, authentication is enabled by creating a Kubernetes generic secret that configures authentication mechanisms. The name of the secret is `{$NAME}-authentication`, e.g. `buses-em-authentication`.
+
+#### Basic authentication
+
+Basic authentication can be configured for all requests.
+
+Click here to see details on [basic authentication](https://github.com/IBMStreams/endpoint-monitor/blob/master/docs/BASICAUTH.md)
+
+#### Webhook signature authentication
+
+Requests with a body can be authenticated using a signature and a shared secret.
 
 Click here to see details on [enabling signature authentication](https://github.com/IBMStreams/endpoint-monitor/blob/master/docs/signature_auth.md)
+
+Signature authentication can be an additional layer to other authentication mechanisms, such as basic authenication.
 
 ### 4. Define HTTPS certificates
 
