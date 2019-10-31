@@ -8,4 +8,4 @@ To enable this signature verification, create a kubernetes opaque/generic secret
 <img width="394" alt="image" src="https://user-images.githubusercontent.com/3769612/65935654-b6229a80-e3ce-11e9-92ff-a13ace0f7cf6.png">
 
 
-The signature is computed as a SHA1 hmac on the request body, using the secret key, and is stored as a hmac hex digest in the request’s `x-signature` HTTP header. 
+The signature is computed as a SHA1 hmac on the request body, using the secret key, and is stored as a hmac hex digest in the request’s `X-Signature` HTTP header. 
