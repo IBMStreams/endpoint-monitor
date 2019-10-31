@@ -118,9 +118,10 @@ Optional - Create a kubernetes generic secret that defines authentication for th
 The name of the secret is `${NAME}-authentication` e.g. `buses-em-authentication`.
 
 For signature verification of POST, PUT, PATCH requests create the property `signature-secret` with the value of secret.
-(See #8 for details of signature).
 
-<img width="394" alt="image" src="https://user-images.githubusercontent.com/3769612/65935654-b6229a80-e3ce-11e9-92ff-a13ace0f7cf6.png">
+Click here to see details on [enabling signature authentication](https://github.com/IBMStreams/endpoint-monitor/blob/master/docs/signature_auth.md)
+
+Click here to see the internal details on how [signature authentication](https://github.com/IBMStreams/endpoint-monitor/blob/master/docs/internal/signature_verification.md) works
 
 ### 4. Define HTTPS certificates
 
