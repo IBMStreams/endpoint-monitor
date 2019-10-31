@@ -22,7 +22,7 @@ The Streams application containing endpoints must be submitted to a job group th
 Endpoints are supported by the `streamsx.endpoint` package, installable from pip:
 
    * PyPi - https://pypi.org/project/streamsx.endpoint/
-   * Documentation - https://streamsxendpoint.readthedocs.io/en/1.0.1/
+   * Documentation - https://streamsxendpoint.readthedocs.io
    
 Example of an application endpoint that supports HTTP POST requests that insert the body of the POST as JSON into the stream as a single tuple.
 
