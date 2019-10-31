@@ -78,7 +78,11 @@ stream<Json> locations = com.ibm.streamsx.inet.rest::HTTPJSONInjection() {
 
 Pick a name for the application (e.g. `buses-em`), this will be passed to *oc new-app* as the parameter `NAME` and will also be the name of the Kubernetes service exposes the REST endpoints. This name is referred to a `${NAME}` in the following steps.
 
-1. Create a kubernetes generic secret that identifies a Streams instance user that has authorization to view job information for the selected job group(s) through the Streams REST api:
+1. Create a kubernetes generic secret that identifies a Streams instance user that has authorization to:
+ * view job information for the selected job group(s) through the Streams REST api
+ * create Streams application configurations that can be read by Streams users submitting jobs to the selected job group(s).
+
+The secret must contain these two keys and values:
 
  * `STREAMS_USERNAME` - User identifier for Streams user.
  * `STREAMS_PASSWORD` - Password for Streams user.
