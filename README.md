@@ -55,11 +55,11 @@ Endpoint-monitor creates shortened paths for these operators in `com.ibm.streams
    * *context*/*name*/`inject` - Injection of tuples to output port 0
 * `HTTPTupleInjection`
    * *context*/*name*/`inject` - Injection of tuples to output port 0
-   * *context*/*name*/`form` - Simple HTML form to injecti tuples to output port 0
+   * *context*/*name*/`form` - Simple HTML form to inject tuples to output port 0
 * `HTTPTupleView`
    * *context*/*name*/`tuples` - Access to tuples exposed by the operator
 
-For example with an endpoint-monitor name `buses-em` this is the URL  for an injection endpoint with context `buses`, name `locations` in in job named `transit`:
+For example with an endpoint-monitor name `buses-em` this is the URL for an injection endpoint with context `buses`, name `locations` in in job named `transit`:
 
 ``https://buses-em.myproject.svc:8443/transit/buses/locations/inject``
 
