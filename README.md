@@ -8,12 +8,14 @@ Nginx reverse proxy sample application to Streams REST endpoints.
 
 ## Overview
 
-Endpoint-monitor is an Openshift application that monitors running jobs in a single Streams Cloud Pak for Data instance (within the same cluster and namespace) for REST endpoints, such as injection of tuples from a REST POST into a stream.
+Endpoint-monitor is an Openshift application that monitors running jobs in a single Streams Cloud Pak for Data instance (within the same cluster and namespace) for RESTful endpoints, such as injection of tuples from a REST POST into a stream.
 Streams Cloud Pak for Data integrated and standalone instances are supported.
 
-This then bridges the gap between traditional HTTP REST microservices and streaming applications. A REST microservice can inject tuples into a stream, access the contents of windows etc.
+This then bridges the gap between traditional HTTP RESTful microservices and streaming applications. A RESTful microservice can inject tuples into a stream, access the contents of windows etc.
 
-The endpoints from the REST operators are exposed with fixed URLs through a service using an Nginx reverse proxy. Thus if a PE hosting a REST operator restarts and changes its IP address and/or server port number endpoint-monitor will update the nginx configuration to allow the fixed URL to find the operator correctly.
+The endpoints are exposed with fixed URLs through a Kubernetes service using an Nginx reverse proxy. If a PE hosting an endpoint (REST operator) restarts and changes its IP address and/or server port number, endpoint-monitor will update the nginx configuration to allow the fixed URL to find the operator correctly.
+
+The endpoint service is available within the cluster and may be exposed outside of the cluster using standard Openshift/Kubernetes techniques, such as `oc expose`. For webhook use by other services the service much be reachable through a public internet address.
 
 Multiple endpoint-monitors can be running against a single Streams instance, for example one that exposes endpoints to applications within the cluster and one that exposes a limited set of endpoints externally. Separation is provided through
 Streams job groups, e.g. the internal monitor might be monitoring jobs in the `green` job group while the external is monitoring the `red` job group.
@@ -49,7 +51,7 @@ The operators should be configured with these parameters:
  * `context:` *context* - Context lead in for the exposed paths. Ensures the paths remain fixed regardless of SPL application changes, such as refactoring into multiple composites.
  * `sslAppConfigName:` *${NAME}*`-streams-certs` - Optional - set if connections between the endpoint-monitor and the Streams endpoints must use HTTPS/SSL. `${NAME}` is the name of the endpoint-monitor application, see Setup.
 
-All REST operators within the application must use the same settings for `port` (0) and `sslAppConfigName` which ensures
+All REST operators within the application **must use the same settings** for `port` (0) and `sslAppConfigName` which ensures
 operators fused into the same PE share a single Jetty server. Only a single Jetty server is supported per-PE.
 
 Multiple Jetty servers within the same job are supported, by means of the REST operators being in multiple PEs. Thus for example an injection operator as the source of the application need not be fused with an instance of `HTTPTupleView` at the end of the graph.
@@ -81,7 +83,12 @@ stream<Json> locations = com.ibm.streamsx.inet.rest::HTTPJSONInjection() {
 
 ## Setup
 
-Pick a name for the application (e.g. `buses-em`), this will be passed to *oc new-app* as the parameter `NAME` and will also be the name of the Kubernetes service exposes the REST endpoints. This name is referred to a `${NAME}` in the following steps.
+Pick a name for the application (e.g. `buses-em`), this will be passed to *oc new-app* as the parameter `NAME` and will also be the name of the Kubernetes service exposing the REST endpoints.
+
+This name is referred to a `${NAME}` in the following steps.
+
+The service is an Nginx HTTPS server on port 8443, for example its service URL within the cluster would be
+`https://buses-em.myproject.svc:8443`.
 
 ### 1. Define Streams user
 
@@ -135,7 +142,7 @@ Optional - Create a kubernetes generic secret `${NAME}-streams-certs` that defin
 
 Click here to see details on [creating the certificates secret](https://github.com/IBMStreams/endpoint-monitor/blob/master/docs/JETTYCERTS.md).
 
-### 5 Deploy application
+### 5. Deploy application
 
 Using an Openshift cluster run `oc new-app` to build and deploy the *endpoint-monitor* application:
 
