@@ -172,7 +172,7 @@ Example URLs within the cluster for *application-name* of `buses-em` in project 
 
 The template uses the nginx and python 3.6 source to image (s2i) setups to define two containers (nginx & python) within a single pod. The two containers share a local volume (`/opt/streams_job_configs`) and communicate through a named pipe on the volume.
  * nginx 1.14 s2i - https://github.com/sclorg/nginx-container/tree/master/1.14
- * python 3.6 s2i - tbd
+ * python 3.6 s2i - https://github.com/sclorg/s2i-python-container/tree/master/3.6
 
 The python container monitors the Streams instance using the REST api through its sws service and as jobs are submitted and canceled it updates each job's reverse proxy configuration in `/opt/streams_job_configs`. Once a job configuration has been written it sends a `reload` action through the named pipe.
 
