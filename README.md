@@ -83,7 +83,9 @@ stream<Json> locations = com.ibm.streamsx.inet.rest::HTTPJSONInjection() {
 
 Pick a name for the application (e.g. `buses-em`), this will be passed to *oc new-app* as the parameter `NAME` and will also be the name of the Kubernetes service exposes the REST endpoints. This name is referred to a `${NAME}` in the following steps.
 
-1. Create a kubernetes generic secret that identifies a Streams instance user that has authorization to:
+### 1. Define Streams user
+
+Create a kubernetes generic secret that identifies a Streams instance user that has authorization to:
  * view job information for the selected job group(s) through the Streams REST api
  * create Streams application configurations that can be read by Streams users submitting jobs to the selected job group(s).
 
@@ -96,7 +98,9 @@ The secret must contain these two keys and values:
 
 The name of the secret is used in step 4 as the `STREAMS_USER_SECRET` parameter.
 
-2. If your `openshift` project does not contain the image `nginx:1.14` then add it using.
+### 2. Define images
+
+If your `openshift` project does not contain the image `nginx:1.14` then add it using.
 
 ```
 oc login system:admin
@@ -107,7 +111,9 @@ oc tag docker.io/centos/nginx-114-centos7:latest nginx:1.14
 If you your image streams are in different namespace to `openshift` then use that as the project and set the `NAMESPACE`
 parameter when invoking `oc new-app`.
 
-3. Optional - Create a kubernetes generic secret that defines authentication for the endpoint-monitor service.
+### 3. Endpoint service authentication
+
+Optional - Create a kubernetes generic secret that defines authentication for the endpoint-monitor service.
 
 The name of the secret is `${NAME}-authentication` e.g. `buses-em-authentication`.
 
@@ -116,16 +122,15 @@ For signature verification of POST, PUT, PATCH requests create the property `sig
 
 <img width="394" alt="image" src="https://user-images.githubusercontent.com/3769612/65935654-b6229a80-e3ce-11e9-92ff-a13ace0f7cf6.png">
 
-4. Optional - Create a kubernetes generic secret that defines certificates for Streams Jetty operators
+### 4. Define HTTPS certificates
 
-This step allows HTTPS between nginx and the Streams operators.
+Optional - Create a kubernetes generic secret `${NAME}-streams-certs` that defines certificates to enable HTTPS between the Nginx reverse proxy and the endpoints within the Streams jobs.
 
-The name of the secret is `${NAME}-streams-certs` e.g. `buses-em-streams-certs`.
+Click here to see details on [creating the certificates secret](https://github.com/IBMStreams/endpoint-monitor/blob/master/docs/JETTYCERTS.md).
 
-See issue #30 for details on this work in progress
+### 5 Deploy application
 
-
-5. Using an Openshift cluster run `oc new-app` to build and deploy the *endpoint-monitor* application:
+Using an Openshift cluster run `oc new-app` to build and deploy the *endpoint-monitor* application:
 
 ```
 oc new-app \
