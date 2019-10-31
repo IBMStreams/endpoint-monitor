@@ -11,7 +11,12 @@ Nginx reverse proxy sample application to Streams REST endpoints.
 Endpoint-monitor is an Openshift application that monitors running jobs in a single Streams Cloud Pak for Data instance (within the same cluster and namespace) for REST endpoints, such as injection of tuples from a REST POST into a stream.
 Streams Cloud Pak for Data integrated and standalone instances are supported.
 
-The endpoints from the REST operators are then exposed with fixed URLs through a service using an Nginx reverse proxy. Thus if a PE hosting a REST operator restarts and changes its IP address and/or server port number endpoint-monitor will update the nginx configuration to allow the fixed URL to find the operator correctly.
+This then bridges the gap between traditional HTTP REST microservices and streaming applications. A REST microservice can inject tuples into a stream, access the contents of windows etc.
+
+The endpoints from the REST operators are exposed with fixed URLs through a service using an Nginx reverse proxy. Thus if a PE hosting a REST operator restarts and changes its IP address and/or server port number endpoint-monitor will update the nginx configuration to allow the fixed URL to find the operator correctly.
+
+Multiple endpoint-monitors can be running against a single Streams instance, for example one that exposes endpoints to applications within the cluster and one that exposes a limited set of endpoints externally. Separation is provided through
+Streams job groups, e.g. the internal monitor might be monitoring jobs in the `green` job group while the external is monitoring the `red` job group.
 
 ## Streams application endpoints
 
