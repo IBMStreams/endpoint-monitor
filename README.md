@@ -12,7 +12,7 @@ This then bridges the gap between traditional HTTP RESTful microservices and str
 
 The endpoints are exposed with fixed URLs through a Kubernetes service using an Nginx reverse proxy. If a PE hosting an endpoint (REST operator) restarts and changes its IP address and/or server port number, endpoint-monitor will update the nginx configuration to allow the fixed URL to find the operator correctly.
 
-The endpoint service is available within the cluster and may be exposed outside of the cluster using standard Openshift/Kubernetes techniques, such as `oc expose`. For webhook use by other services the service much be reachable through a public internet address.
+The endpoint service is available within the cluster and may be exposed outside of the cluster using standard Openshift/Kubernetes techniques, such as `oc expose`. For webhook use by other services the service must be reachable through a public internet address.
 
 Multiple endpoint-monitors can be running against a single Streams instance, for example one that exposes endpoints to applications within the cluster and one that exposes a limited set of endpoints externally. Separation is provided through
 Streams job groups, e.g. the internal monitor might be monitoring jobs in the `green` job group while the external is monitoring the `red` job group.
@@ -32,7 +32,7 @@ Endpoints are supported by the `streamsx.endpoint` package, installable from pip
    * PyPi - https://pypi.org/project/streamsx.endpoint/
    * Documentation - https://streamsxendpoint.readthedocs.io
    
-Example of an application endpoint that supports HTTP POST requests that insert the body of the POST as JSON into the stream as a single tuple.
+Example of an application endpoint that supports HTTPS POST requests that insert the body of the POST as JSON into the stream as a single tuple.
 
 ```
 from streamsx.topology.topology import Topology
