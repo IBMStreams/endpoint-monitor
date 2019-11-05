@@ -2,14 +2,11 @@
 
 Nginx reverse proxy sample application to Streams REST endpoints.
 
-# UNDER DEVELOPMENT
-
-**Application is under development, apis, behavior etc. are subject to change.**
-
 ## Overview
 
-Endpoint-monitor is an Openshift application that monitors running jobs in a single Streams Cloud Pak for Data instance (within the same cluster and namespace) for RESTful endpoints, such as injection of tuples from a REST POST into a stream.
-Streams Cloud Pak for Data integrated and standalone instances are supported.
+Endpoint-monitor is an Openshift application that monitors running jobs in a single Streams Cloud Pak for Data instance (within the same cluster and namespace) for RESTful endpoints, such as injection of tuples from a REST POST into a stream, and exposes them through a OpenShift Nginx service.
+
+Streams Cloud Pak for Data (2.5) integrated and standalone instances are supported.
 
 This then bridges the gap between traditional HTTP RESTful microservices and streaming applications. A RESTful microservice can inject tuples into a stream, access the contents of windows etc.
 
@@ -90,6 +87,8 @@ This name is referred to a `${NAME}` in the following steps.
 The service is an Nginx HTTPS server on port 8443, for example its service URL within the cluster would be
 `https://buses-em.myproject.svc:8443`.
 
+HTTPS is the only supported protocol for clients connecting to the Nginx service. The server certificate is obtained from the cluster using this technique: https://docs.openshift.com/container-platform/3.6/dev_guide/secrets.html#service-serving-certificate-secrets
+
 ### 1. Define Streams user
 
 Create a kubernetes generic secret that identifies a Streams instance user that has authorization to:
@@ -136,7 +135,7 @@ Click here to see details on [enabling signature authentication](https://github.
 
 Signature authentication can be an additional layer to other authentication mechanisms, such as basic authenication.
 
-### 4. Define HTTPS certificates
+### 4. Define HTTPS certificates used by Streams applications
 
 Optional - Create a kubernetes generic secret `${NAME}-streams-certs` that defines certificates to enable HTTPS between the Nginx reverse proxy and the endpoints within the Streams jobs.
 
