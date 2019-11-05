@@ -17,6 +17,8 @@ The endpoint service is available within the cluster and may be exposed outside 
 Multiple endpoint-monitors can be running against a single Streams instance, for example one that exposes endpoints to applications within the cluster and one that exposes a limited set of endpoints externally. Separation is provided through
 Streams job groups, e.g. the internal monitor might be monitoring jobs in the `green` job group while the external is monitoring the `red` job group.
 
+Here's a diagram showing the interaction of clients, endpoint-monitor and Streams jobs.
+
 <img width="932" alt="image" src="https://user-images.githubusercontent.com/3769612/68225608-8b1b0000-ffa5-11e9-895e-331a0acebb51.png">
 
 ## Streams application endpoints
