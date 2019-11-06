@@ -10,6 +10,7 @@ import streamsx.scripts.info as info
 
 from file_config import FileWriter
 from multi_config import MultiConfig
+from swagger_config import SwaggerConfig
 from endpoint_monitor import EndpointMonitor
 import app_config_certs
 import streams_openshift
@@ -77,7 +78,7 @@ client_cert = _process_streams_certs()
 
 cfg = FileWriter(location=os.path.join(OPT, 'job-configs'), client_cert=client_cert, signature=_has_signature_secret())
 
-swagger = SwaggerConfig(os.path.join(OPT, 'swagger'), instance_name):w
+swagger = SwaggerConfig(os.path.join(OPT, 'swagger'), instance_name)
 
 cfg = MultiConfig(cfg, swagger)
 
