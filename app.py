@@ -78,7 +78,7 @@ client_cert = _process_streams_certs()
 
 cfg = FileWriter(location=os.path.join(OPT, 'job-configs'), client_cert=client_cert, signature=_has_signature_secret())
 
-swagger = SwaggerConfig(os.path.join(OPT, 'swagger'), instance_name)
+swagger = SwaggerConfig(os.path.join(OPT, 'swagger-defs'), instance_name)
 
 cfg = MultiConfig(cfg, swagger)
 

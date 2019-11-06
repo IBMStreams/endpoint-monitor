@@ -20,9 +20,9 @@ class SwaggerConfig(object):
         fcfn = os.path.join(self._location, cfn)
         ftfn = os.path.join(self._location, tfn)
         with open(ftfn, 'w') as f:
-            f.write('job_urls = JSON.parse(')
+            f.write("job_urls = JSON.parse('")
             json.dump(list(self._jobs.values()), f)
-            f.write(')')
+            f.write("')")
         os.rename(ftfn, fcfn)
 
     def _job_name(self, jobid, job_config):
@@ -38,7 +38,7 @@ class SwaggerConfig(object):
     def create(self, jobid, job_config):
         name, file = self._create_swagger_file(jobid, job_config)
         job_config.swagger_file = file
-        self._jobs[jobid] = {'url':'swagger/'+name+'.json', 'name':name}
+        self._jobs[jobid] = {'url':'swagger-defs/'+name+'.json', 'name':name}
         self._update_jobs_file()
 
     def delete(self, jobid, job_config):
