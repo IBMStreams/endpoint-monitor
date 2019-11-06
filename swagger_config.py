@@ -20,8 +20,9 @@ class SwaggerConfig(object):
         fcfn = os.path.join(self._location, cfn)
         ftfn = os.path.join(self._location, tfn)
         with open(ftfn, 'w') as f:
-            for job in self._jobs:
-                pass
+            f.write('job_urls = JSON.parse(')
+            json.dump(list(self._jobs.values()), f)
+            f.write(')')
         os.rename(ftfn, fcfn)
 
     def _job_name(self, jobid, job_config):
@@ -31,18 +32,19 @@ class SwaggerConfig(object):
             return job_config.name
         
     def clean(self):
-        # Remove all -streams-job-%s.conf
         self._jobs = {}
         self._update_jobs_file()
   
     def create(self, jobid, job_config):
-        self._create_swagger_file(jobid, job_config)
-        #job_config.swagger_file = self._write_file(jobid, location, job_config)
+        name, file = self._create_swagger_file(jobid, job_config)
+        job_config.swagger_file = file
+        self._jobs[jobid] = {'url':'swagger/'+name+'.json', 'name':name}
         self._update_jobs_file()
 
     def delete(self, jobid, job_config):
         if hasattr(job_config, 'swagger_file'):
             os.remove(job_config.swagger_file)
+        del self._jobs[jobid]
         self._update_jobs_file()
 
     def update(self, jobid, old_job_config, job_config):
@@ -51,12 +53,13 @@ class SwaggerConfig(object):
 
     def _create_swagger_file(self, jobid, job_config):
         name = self._job_name(jobid, job_config)
-        fname = name + '.json'
-        tname = fname + '.tmp'
+        fname = os.path.join(self._location, name + '.json')
+        tname = os.path.join(self._location, fname + '.tmp')
         with open(tname, 'w') as f:
             swg = self._job_swagger(name, jobid, job_config)
             json.dump(swg, f)
         os.rename(tname, fname)
+        return name, fname
 
     def _job_swagger(self, name, jobid, job_config):
         with open(os.path.join(TEMPLATES, 'job.json')) as f:
