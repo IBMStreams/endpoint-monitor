@@ -51,6 +51,7 @@ class SwaggerConfig(object):
         tname = os.path.join(self._location, fname + '.tmp')
         with open(tname, 'w') as f:
             swg = self._job_swagger(name, jobid, job_config)
+            self._aliases_swagger(swg, job_config)
             json.dump(swg, f)
         os.rename(tname, fname)
         return name, fname
@@ -66,4 +67,23 @@ class SwaggerConfig(object):
         swg['info']['title'] = title.format(job_name=name)
         swg['basePath'] = job_config.path
         return swg
+
+    def _aliases_swagger(self, swg, job_config):
+        for server in job_config.servers:
+            paths = swg['paths']
+            details = job_config.server_details[server]
+            for alias, info in details.aliases.items():
+                kind = info['kind']
+                if kind == 'com.ibm.streamsx.inet.rest::HTTPJSONInjection':
+                    self._json_inject(paths, alias)
+
+    def _json_inject(self, paths, alias):
+        with open(os.path.join(TEMPLATES, 'jsoninject.json')) as f:
+            template = json.load(f)
+        
+        swg = template['{path}']
+        context = alias.split('/')[0]
+        swg['post']['tags'][0] = context
+        paths[alias] = swg
+       
 

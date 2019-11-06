@@ -1,0 +1,33 @@
+{
+    "{path}": {
+      "post": {
+        "tags": [
+          "{context}"
+        ],
+        "summary": "Inject a tuple into a stream",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "JSON Tuple to be added to the stream",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Tuple injected"
+          }
+        }
+      }
+    }
+}
