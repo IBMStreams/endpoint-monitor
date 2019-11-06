@@ -14,7 +14,7 @@ class SwaggerConfig(object):
             os.mkdir(self._location)
         self.clean()
 
-    def _update_jobs_file():
+    def _update_jobs_file(self):
         cfn = 'jobs.js'
         tfn = cfn + '.tmp'
         fcfn = os.path.join(self._location, cfn)
@@ -49,7 +49,7 @@ class SwaggerConfig(object):
         self.delete(jobid, old_job_config)
         self.create(jobid, job_config)
 
-    def _create_swagger_file(jobid, job_config):
+    def _create_swagger_file(self, jobid, job_config):
         name = self._job_name(jobid, job_config)
         fname = name + '.json'
         tname = fname + '.tmp'
@@ -58,9 +58,9 @@ class SwaggerConfig(object):
             json.dump(swg, f)
         os.rename(tname, fname)
 
-    def _job_swagger(name, jobid, job_config):
-        with open(os.path.join(TEMPLATES, 'job.json')) as j:
-            swg = json.load(j)
+    def _job_swagger(self, name, jobid, job_config):
+        with open(os.path.join(TEMPLATES, 'job.json')) as f:
+            swg = json.load(f)
 
         desc = swg['info']['description']
         swg['info']['description'] = desc.format(
