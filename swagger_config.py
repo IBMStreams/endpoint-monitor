@@ -27,7 +27,7 @@ class SwaggerConfig(object):
     def _job_name(jobid, job_config):
         if job_config.name == job_config.applicationName + '_' + jobid:
             return 'job-%s' % jobid
-        else
+        else:
             return job_config.name
         
     def clean(self):
@@ -54,14 +54,11 @@ class SwaggerConfig(object):
         fname = name + '.json'
         tname = fname + '.tmp'
         with open(tname, 'w') as f:
-            self._write_swagger(f, name, jobid, job_config)
+            swg = self._job_swagger(name, jobid, job_config)
+            json.dump(swg, f)
         os.rename(tname, fname)
 
-    def _write_swagger_file(f, name, jobid, job_config):
-        swg = self._job_swagger(jobid, job_config)
-        json.dump(swg, f)
-    
-    def _job_swagger(jobid, job_config):
+    def _job_swagger(name, jobid, job_config):
         with open(os.path.join(TEMPLATES, 'job.json')) as j:
             swg = json.load(j)
 
