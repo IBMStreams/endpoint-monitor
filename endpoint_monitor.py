@@ -192,7 +192,7 @@ class EndpointMonitor(object):
         LOGGER.debug("Scan for jobs")
         current_jobs = self._survey_jobs()
         existing_jobs = list(self._jobs.keys())
-        LOGGER.debug("Existing jobs", existing_jobs)
+        LOGGER.debug("Existing jobs: %s", existing_jobs)
         for jobid in existing_jobs:
             # Check if existing job is still running
             ne = current_jobs.pop(jobid, None)

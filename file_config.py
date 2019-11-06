@@ -108,7 +108,7 @@ class FileWriter(object):
             # Aliases to operator functional paths (e.g. inject)
             for a,p in details.aliases.items():
                 loc = location + a.replace('/','',1) 
-                url = server_root_url + p.replace('/','',1)
+                url = server_root_url + p['path'].replace('/','',1)
                 self._proxy_entry(f, loc, proto, url)
 
         # A final catch all
