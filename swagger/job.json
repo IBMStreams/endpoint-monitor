@@ -5,12 +5,8 @@
     "version": "1.0.0",
     "title": "{job_name}"
   },
-  "host": "HOST",
   "basePath": "{job_path}",
   "tags": [ ],
-  "schemes": [
-    "https"
-  ],
   "paths": { },
   "externalDocs": {
     "description": "IBM Streams Endpoint Monitor",
