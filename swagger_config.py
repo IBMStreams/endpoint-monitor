@@ -24,7 +24,7 @@ class SwaggerConfig(object):
                 pass
         os.rename(ftfn, fcfn)
 
-    def _job_name(jobid, job_config):
+    def _job_name(self, jobid, job_config):
         if job_config.name == job_config.applicationName + '_' + jobid:
             return 'job-%s' % jobid
         else:
