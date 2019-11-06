@@ -66,6 +66,15 @@ class SwaggerConfig(object):
         title = swg['info']['title']
         swg['info']['title'] = title.format(job_name=name)
         swg['basePath'] = job_config.path
+
+        contexts = set()
+        for server in job_config.servers:
+            details = job_config.server_details[server]
+            contexts.update(details.contexts)
+        tags = swg['tags']
+        for ctx in contexts:
+            tags.append({'name':ctx})
+   
         return swg
 
     def _aliases_swagger(self, swg, job_config):
