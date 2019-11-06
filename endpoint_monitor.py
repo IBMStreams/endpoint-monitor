@@ -39,9 +39,9 @@ def _job_new_incarnation(job):
     Returns an object with all the required job information
     and REST endpoints (if any)
     """
-    name = getattr(job, 'name')
-    generationId = getattr(job, 'generationId')
-    applicationName = getattr(job, 'applicationName')
+    name = job.name
+    generationId = job.generationId
+    applicationName = job.applicationName
     ops = {}
     pes = {}
     ops_in_pe = {}
@@ -60,7 +60,9 @@ def _job_new_incarnation(job):
             else:
                 ops_in_pe[pe.id] = [op.name]
 
-    return EndpointJob(name, generationId, applicationName, servers, ops, pes, ops_in_pe)
+    ej = EndpointJob(name, generationId, applicationName, servers, ops, pes, ops_in_pe)
+    ej.set_path(job.id)
+    return ej
 
 
 def _job_update(job_info, j):
@@ -125,7 +127,9 @@ def _job_update(job_info, j):
         # Add the new servers
         new_servers = valid_servers.union(servers_to_add)
         # Update the job w/ the new info
-        return EndpointJob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, job_info.ops, job_info.pes, job_info.ops_in_pe)
+        ej = EndpointJob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, job_info.ops, job_info.pes, job_info.ops_in_pe)
+        ej.set_path(j.id)
+        return ej
 
     # PE's may or may not have restarted, but no new servers are up, thus don't update job, don't change config
     return job_info
