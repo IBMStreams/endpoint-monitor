@@ -1,0 +1,19 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Endpoints within Streams job {job_name} (id {job_id}) in instance {instance_id}.",
+    "version": "1.0.0",
+    "title": "{job_name}"
+  },
+  "host": "HOST",
+  "basePath": "/JOB_PATH",
+  "tags": [ ],
+  "schemes": [
+    "https"
+  ],
+  "paths": { },
+  "externalDocs": {
+    "description": "IBM Streams Endpoint Monitor",
+    "url": "https://github.com/IBMStreams/endpoint-monitor/blob/master/README.md"
+  }
+}

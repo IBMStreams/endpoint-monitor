@@ -77,7 +77,9 @@ client_cert = _process_streams_certs()
 
 cfg = FileWriter(location=os.path.join(OPT, 'job-configs'), client_cert=client_cert, signature=_has_signature_secret())
 
-cfg = MultiConfig(cfg)
+swagger = SwaggerConfig(os.path.join(OPT, 'swagger'), instance_name):w
+
+cfg = MultiConfig(cfg, swagger)
 
 em = EndpointMonitor(endpoint=sws_service, config=cfg, job_filter=job_filter, client_cert=client_cert, verify=False)
 
