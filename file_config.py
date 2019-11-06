@@ -22,10 +22,7 @@ class FileWriter(object):
             os.mkfifo(self._pipe_name)
   
     def create(self, jobid, job_config):
-        if job_config.name == job_config.applicationName + '_' + jobid:
-            location = '/streams/jobs/' + str(jobid) + '/'
-        else:
-            location = '/' + job_config.name + '/'
+        location = self.path
 
         job_config.config_file = self._write_file(jobid, location, job_config)
         self._reload()

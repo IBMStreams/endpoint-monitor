@@ -251,5 +251,13 @@ class EndpointJob:
         self.pes = pes # Dictionary mapping PE id's to their launchCount
         self.ops_in_pe = ops_in_pe # Dictionary mapping a PE.id to a list of the names of rest operators, that given PE contains (ie ops_in_pe[pe_id] = [op1_name, op2_name])
 
+    def set_path(self, jobid):
+        if self.name == self.applicationName + '_' + jobid:
+            self.path = '/streams/jobs/' + str(jobid) + '/'
+            self.alias = 'job-%s' % jobid
+        else:
+            self.path = '/' + self.name + '/'
+            self.alias = self.name
+
     def __str__(self):
         return "name=%s servers=%s, details=%s, ops=%s, pes=%s, application=%s" % (self.name, self.servers, self.server_details.values(), self.ops, self.pes, self.applicationName)

@@ -25,12 +25,6 @@ class SwaggerConfig(object):
             f.write("')")
         os.rename(ftfn, fcfn)
 
-    def _job_name(self, jobid, job_config):
-        if job_config.name == job_config.applicationName + '_' + jobid:
-            return 'job-%s' % jobid
-        else:
-            return job_config.name
-        
     def clean(self):
         self._jobs = {}
         self._update_jobs_file()
@@ -52,7 +46,7 @@ class SwaggerConfig(object):
         self.create(jobid, job_config)
 
     def _create_swagger_file(self, jobid, job_config):
-        name = self._job_name(jobid, job_config)
+        name = 
         fname = os.path.join(self._location, name + '.json')
         tname = os.path.join(self._location, fname + '.tmp')
         with open(tname, 'w') as f:
@@ -70,5 +64,6 @@ class SwaggerConfig(object):
             job_id=jobid, job_name=job_config.name, instance_id=self._instance)
         title = swg['info']['title']
         swg['info']['title'] = title.format(job_name=name)
+        swg['basePath'] = job_config.path
         return swg
 

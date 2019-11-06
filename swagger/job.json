@@ -6,7 +6,7 @@
     "title": "{job_name}"
   },
   "host": "HOST",
-  "basePath": "/JOB_PATH",
+  "basePath": "{job_path}",
   "tags": [ ],
   "schemes": [
     "https"
