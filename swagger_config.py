@@ -46,7 +46,7 @@ class SwaggerConfig(object):
         self.create(jobid, job_config)
 
     def _create_swagger_file(self, jobid, job_config):
-        name = 
+        name = job_config.alias
         fname = os.path.join(self._location, name + '.json')
         tname = os.path.join(self._location, fname + '.tmp')
         with open(tname, 'w') as f:
