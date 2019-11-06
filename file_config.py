@@ -22,7 +22,7 @@ class FileWriter(object):
             os.mkfifo(self._pipe_name)
   
     def create(self, jobid, job_config):
-        location = self.path
+        location = job_config.path
 
         job_config.config_file = self._write_file(jobid, location, job_config)
         self._reload()
