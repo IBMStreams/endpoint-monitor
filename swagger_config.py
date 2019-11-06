@@ -91,7 +91,7 @@ class SwaggerConfig(object):
             template = json.load(f)
         
         swg = template['{path}']
-        context = alias.split('/')[0]
+        context = alias.split('/')[1]
         swg['post']['tags'] = [ context ]
         paths[alias] = swg
        
