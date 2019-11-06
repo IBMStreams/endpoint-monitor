@@ -38,7 +38,7 @@ class SwaggerConfig(object):
     def delete(self, jobid, job_config):
         if hasattr(job_config, 'swagger_file'):
             os.remove(job_config.swagger_file)
-        del self._jobs[jobid]
+            del self._jobs[jobid]
         self._update_jobs_file()
 
     def update(self, jobid, old_job_config, job_config):
