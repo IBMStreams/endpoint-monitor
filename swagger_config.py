@@ -92,7 +92,7 @@ class SwaggerConfig(object):
         
         swg = template['{path}']
         context = alias.split('/')[0]
-        swg['post']['tags'][0] = context
+        swg['post']['tags'] = [ context ]
         paths[alias] = swg
        
 
