@@ -4,9 +4,17 @@
 <p>Endpoint-monitor is an Openshift application template that exposes REST endpoints within an IBM Streams running job as REST endpoints through an Nginx reverse proxy service.</p>
 <p>The service supports a single Streams instance with one or more jobs.</p>
 <p>The service may be exposed outside of the Openshift cluster using a route.</p>
+<h2 style="color: #2e6c80;">Endpoint swagger</h2>
+<p>
+Generated swagger for the endpoints can be viewed at <a href="swagger-ui.html">swagger-ui.html</a>
+</p>
 <h2 style="color: #2e6c80;">Streams job endpoints</h2>
 <h3>Python Streams applications</h3>
-<p>TBD</p>
+<p>
+Endpoints are <a href="https://github.com/IBMStreams/endpoint-monitor/blob/master/README.md#python-topology-applications">supported by the <code>streamsx.endpoint</code> package</a>.
+</p>
 <h3>SPL Streams applications</h3>
-<p>TBD - Streams REST operators from com.ibm.streamsx.inetserver</p>
+<p>
+Endpoints are <a href="https://github.com/IBMStreams/endpoint-monitor/blob/master/README.md#spl-applications">instances of REST operators from the <code>com.ibm.streamsx.inetserver</code> toolkit</a>.
+</p>
 </html>

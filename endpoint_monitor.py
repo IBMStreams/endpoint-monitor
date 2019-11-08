@@ -39,9 +39,9 @@ def _job_new_incarnation(job):
     Returns an object with all the required job information
     and REST endpoints (if any)
     """
-    name = getattr(job, 'name')
-    generationId = getattr(job, 'generationId')
-    applicationName = getattr(job, 'applicationName')
+    name = job.name
+    generationId = job.generationId
+    applicationName = job.applicationName
     ops = {}
     pes = {}
     ops_in_pe = {}
@@ -60,7 +60,9 @@ def _job_new_incarnation(job):
             else:
                 ops_in_pe[pe.id] = [op.name]
 
-    return EndpointJob(name, generationId, applicationName, servers, ops, pes, ops_in_pe)
+    ej = EndpointJob(name, generationId, applicationName, servers, ops, pes, ops_in_pe)
+    ej.set_path(job.id)
+    return ej
 
 
 def _job_update(job_info, j):
@@ -125,7 +127,9 @@ def _job_update(job_info, j):
         # Add the new servers
         new_servers = valid_servers.union(servers_to_add)
         # Update the job w/ the new info
-        return EndpointJob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, job_info.ops, job_info.pes, job_info.ops_in_pe)
+        ej = EndpointJob(job_info.name, job_info.generationId, job_info.applicationName, new_servers, job_info.ops, job_info.pes, job_info.ops_in_pe)
+        ej.set_path(j.id)
+        return ej
 
     # PE's may or may not have restarted, but no new servers are up, thus don't update job, don't change config
     return job_info
@@ -188,7 +192,7 @@ class EndpointMonitor(object):
         LOGGER.debug("Scan for jobs")
         current_jobs = self._survey_jobs()
         existing_jobs = list(self._jobs.keys())
-        LOGGER.debug("Existing jobs", existing_jobs)
+        LOGGER.debug("Existing jobs: %s", existing_jobs)
         for jobid in existing_jobs:
             # Check if existing job is still running
             ne = current_jobs.pop(jobid, None)
@@ -250,6 +254,14 @@ class EndpointJob:
         self.ops = ops # Dictionary mapping rest operator name's to operatorKind
         self.pes = pes # Dictionary mapping PE id's to their launchCount
         self.ops_in_pe = ops_in_pe # Dictionary mapping a PE.id to a list of the names of rest operators, that given PE contains (ie ops_in_pe[pe_id] = [op1_name, op2_name])
+
+    def set_path(self, jobid):
+        if self.name == self.applicationName + '_' + jobid:
+            self.path = '/streams/jobs/' + str(jobid) + '/'
+            self.alias = 'job-%s' % jobid
+        else:
+            self.path = '/' + self.name + '/'
+            self.alias = self.name
 
     def __str__(self):
         return "name=%s servers=%s, details=%s, ops=%s, pes=%s, application=%s" % (self.name, self.servers, self.server_details.values(), self.ops, self.pes, self.applicationName)

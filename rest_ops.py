@@ -45,10 +45,10 @@ def _make_port_alias(path, port, output):
     if alias != path:
         return alias
 
-def _add_alias(aliases, path, port, output=True):
+def _add_alias(aliases, path, kind, port, output=True):
     alias = _make_port_alias(path, 0, output)
     if alias:
-        aliases[alias] = path
+        aliases[alias] = {'path':path, 'kind':kind}
 
 def _create_aliases(ports):
     aliases = {}
@@ -56,14 +56,14 @@ def _create_aliases(ports):
         kind = port['operatorKind']
         if kind == 'com.ibm.streamsx.inet.rest::HTTPJSONInjection':
             cps = port['contextPaths']
-            _add_alias(aliases, cps['inject'], 0)
+            _add_alias(aliases, cps['inject'], kind, 0)
         elif kind == 'com.ibm.streamsx.inet.rest::HTTPTupleInjection':
             cps = port['contextPaths']
-            _add_alias(aliases, cps['inject'], 0)
-            _add_alias(aliases, cps['form'], 0)
+            _add_alias(aliases, cps['inject'], kind, 0)
+            _add_alias(aliases, cps['form'], kind, 0)
         elif kind == 'com.ibm.streamsx.inet.rest::HTTPTupleView':
             cps = port['contextPaths']
-            _add_alias(aliases, cps['tuples'], 0, output=False)
+            _add_alias(aliases, cps['tuples'], 0, kind, output=False)
 
     return aliases
     

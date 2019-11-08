@@ -22,10 +22,7 @@ class FileWriter(object):
             os.mkfifo(self._pipe_name)
   
     def create(self, jobid, job_config):
-        if job_config.name == job_config.applicationName + '_' + jobid:
-            location = '/streams/jobs/' + str(jobid) + '/'
-        else:
-            location = '/' + job_config.name + '/'
+        location = job_config.path
 
         job_config.config_file = self._write_file(jobid, location, job_config)
         self._reload()
@@ -111,7 +108,7 @@ class FileWriter(object):
             # Aliases to operator functional paths (e.g. inject)
             for a,p in details.aliases.items():
                 loc = location + a.replace('/','',1) 
-                url = server_root_url + p.replace('/','',1)
+                url = server_root_url + p['path'].replace('/','',1)
                 self._proxy_entry(f, loc, proto, url)
 
         # A final catch all
