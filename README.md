@@ -178,6 +178,17 @@ Example URLs within the cluster for *application-name* of `buses-em` in project 
  * `https://buses-em.myproject.svc:8443/streams/jobs/7/ports/info` for job 7 without an explicitly set job name:
  * `https://buses-em.myproject.svc:8443/transit/buses/locations/inject` for an injection endpoint with context `buses`, name `locations` in in job named `transit`.
  
+## Swagger - EXPERIMENTAL
+
+The path `swagger-ui.html` (e.g. `https://buses-em.myproject.svc:8443/swagger-ui.html`) provides [Swagger UI](https://swagger.io/tools/swagger-ui) to visualize and interact with the endpoints. An OpenAPI specification (Swagger) is provided for each monitored job at:
+
+ * `swagger-defs/`*jobname*.json - When a job name is explicitly set
+ * `swagger-defs/`*jobid*`.json` - When a job name was not explicitly set
+ 
+ The OpenAPi specification is generated based upon the job and its endpoints.
+ 
+ ***Generation may only be supported for a limited number of endpoints.***
+
 ## Implementation notes
 
 The template uses the nginx and python 3.6 source to image (s2i) setups to define two containers (nginx & python) within a single pod. The two containers share a local volume (`/opt/streams_job_configs`) and communicate through a named pipe on the volume.
