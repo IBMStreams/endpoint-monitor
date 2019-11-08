@@ -134,7 +134,7 @@ class FileWriter(object):
         f.write('}\n')
 
         if self._signature:
-            f.write('location ~^ /@internal%s {\n' % location)
+            f.write('location ^~ /@internal%s {\n' % location)
             f.write('  internal;\n');
             self._proxy_location(f, proto, target_url)
             f.write('}\n')
