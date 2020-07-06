@@ -14,8 +14,8 @@ def _find_env_var(pattern):
 
 def get_sws_service(instance_name):
     ievn = _convert_name_to_ev(instance_name)
-    host = _find_env_var(ievn + '_SWS_SERVICE_HOST')
-    port = _find_env_var(ievn + '_SWS_SERVICE_PORT')
+    host = _find_env_var(ievn + '_REST_SERVICE_HOST')
+    port = _find_env_var(ievn + '_REST_SERVICE_PORT')
     if host and port:
         return 'https://{0}:{1}'.format(host, port)
 

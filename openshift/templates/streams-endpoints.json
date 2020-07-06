@@ -317,7 +317,8 @@
         ],
         "selector": {
           "name": "${NAME}"
-        }
+        },
+        "type" : "NodePort"
       }
     }
   ],
