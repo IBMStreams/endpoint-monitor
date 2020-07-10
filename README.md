@@ -129,13 +129,13 @@ By default the endpoint-monitor's RESTful service **does not require authenticat
 
 Basic authentication can be configured for all requests.
 
-Click here to see details on [basic authentication](https://github.com/IBMStreams/endpoint-monitor/blob/master/docs/BASICAUTH.md)
+Click here to see details on [basic authentication](https://github.com/IBMStreams/endpoint-monitor/blob/develop/docs/BASICAUTH.md)
 
 #### Webhook signature authentication
 
 Requests with a body can be authenticated using a signature and a shared secret.
 
-Click here to see details on [enabling signature authentication](https://github.com/IBMStreams/endpoint-monitor/blob/master/docs/signature_auth.md)
+Click here to see details on [enabling signature authentication](https://github.com/IBMStreams/endpoint-monitor/blob/develop/docs/signature_auth.md)
 
 Signature authentication can be an additional layer to other authentication mechanisms, such as basic authenication.
 
@@ -143,7 +143,7 @@ Signature authentication can be an additional layer to other authentication mech
 
 Optional - Create a kubernetes generic secret `${NAME}-streams-certs` that defines certificates to enable HTTPS between the Nginx reverse proxy and the endpoints within the Streams jobs.
 
-Click here to see details on [creating the certificates secret](https://github.com/IBMStreams/endpoint-monitor/blob/master/docs/JETTYCERTS.md).
+Click here to see details on [creating the certificates secret](https://github.com/IBMStreams/endpoint-monitor/blob/develop/docs/JETTYCERTS.md).
 
 ### 5. Deploy application
 
@@ -151,7 +151,7 @@ Using an Openshift cluster run `oc new-app` to build and deploy the *endpoint-mo
 
 ```
 oc new-app \
- -f https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/master/openshift/templates/streams-endpoints.json \
+ -f https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/develop/openshift/templates/streams-endpoints.json \
  -p NAME=<application-name> \
  -p STREAMS_INSTANCE_NAME=<IBMStreamsInstance name> \
  -p JOB_GROUP=<job group pattern> \
@@ -202,4 +202,4 @@ The python container monitors the Streams instance using the REST api through it
 
 The nginx container runs nginx pulling configuration from job endpoint `/opt/streams_job_configs/*.conf`. It also has a shell script that monitors the named pipe and executes its actions using `nginx -s`, e.g. `nginx -s reload`. (currently only `reload` is sent as an action).
 
-Click here to see the internal details on how [signature authentication](https://github.com/IBMStreams/endpoint-monitor/blob/master/docs/internal/signature_verification.md) works
+Click here to see the internal details on how [signature authentication](https://github.com/IBMStreams/endpoint-monitor/blob/develop/docs/internal/signature_verification.md) works

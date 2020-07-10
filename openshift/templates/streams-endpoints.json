@@ -5,7 +5,7 @@
     "name": "streams-endpoint-monitor",
     "annotations": {
       "openshift.io/display-name": "Streams endpoint-monitor",
-      "description": "Nginx reverse proxy application that exposes REST endpoints from Streams jobs. For more information about using this template, see https://github.com/IBMStreams/endpoint-monitor/blob/master/README.md.",
+      "description": "Nginx reverse proxy application that exposes REST endpoints from Streams jobs. For more information about using this template, see https://github.com/IBMStreams/endpoint-monitor/blob/develop/README.md.",
       "tags": "streams,nginx,endpoint-monitor",
       "iconClass": "icon-nginx",
       "openshift.io/long-description": "This template defines resources needed to develop a Nginx reverse proxy that exposes REST endpoints from Streams jobs,  including a build configuration and application deployment configuration.",
@@ -14,7 +14,7 @@
       "openshift.io/support-url": "https://github.com/IBMStreams/endpoint-monitor/issues"
     }
   },
-  "message": "The following service(s) have been created in your project: ${NAME}.\n\nFor more information about using this template, see https://github.com/IBMStreams/endpoint-monitor/blob/master/README.md.",
+  "message": "The following service(s) have been created in your project: ${NAME}.\n\nFor more information about using this template, see https://github.com/IBMStreams/endpoint-monitor/blob/develop/README.md.",
   "labels": {
     "template": "streams-endpoint-monitor"
   },

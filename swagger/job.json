@@ -10,6 +10,6 @@
   "paths": { },
   "externalDocs": {
     "description": "IBM Streams Endpoint Monitor",
-    "url": "https://github.com/IBMStreams/endpoint-monitor/blob/master/README.md"
+    "url": "https://github.com/IBMStreams/endpoint-monitor/blob/develop/README.md"
   }
 }
