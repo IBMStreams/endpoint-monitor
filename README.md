@@ -106,6 +106,14 @@ The secret must contain these two keys and values:
  
  <img width="236" alt="image" src="https://user-images.githubusercontent.com/3769612/64719622-7d516e80-d47d-11e9-9cb3-c90bc4406de5.png">
 
+You can use the following command sequence to create the secret:
+```
+echo -n '<username>' > user.txt
+echo -n '<password>' > passwd.txt
+kubectl create secret generic streams-user --from-file=STREAMS_USERNAME=./user.txt --from-file=STREAMS_PASSWORD=./passwd.txt
+rm user.txt passwd.txt
+```
+
 The name of the secret is used in step 4 as the `STREAMS_USER_SECRET` parameter.
 
 ### 2. Define images
@@ -118,6 +126,7 @@ oc project openshift
 oc tag docker.io/centos/nginx-114-centos7:latest nginx:1.14
 ```
 
+If image `nginx:1.14` is not in project `openshift`, make sure that one project contains the image.
 If you your image streams are in different namespace to `openshift` then use that as the project and set the `NAMESPACE`
 parameter when invoking `oc new-app`.
 
@@ -147,21 +156,33 @@ Click here to see details on [creating the certificates secret](https://github.c
 
 ### 5. Deploy application
 
-Using an Openshift cluster run `oc new-app` to build and deploy the *endpoint-monitor* application:
+Using an Openshift cluster run `oc new-app` to build and deploy the *endpoint-monitor* application. Use the same project where the streams is installed.
+The following command creates a *endpoint-monitor* application with name *streams-endpoint-monitor*
 
 ```
 oc new-app \
  -f https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/develop/openshift/templates/streams-endpoints.json \
- -p NAME=<application-name> \
  -p STREAMS_INSTANCE_NAME=<IBMStreamsInstance name> \
  -p JOB_GROUP=<job group pattern> \
- -p STREAMS_USER_SECRET=<streams user secret>
 ```
 
-* `NAME` - Name of the openshift/kubernetes service that provides access to the REST endpointd
 * `STREAMS_INSTANCE_NAME` - Name of the Kubernetes object `IBMStreamsInstance` defined in the yaml file when creating the Streams instance.
 * `JOB_GROUP` - Job group pattern. Only jobs with groups that match this pattern will be monitored for REST operators. **Currently only a actual job group can be supplied, not a regular expression.**
+
+The command may be used with additional parameters:
+* `NAME` - Name of the openshift/kubernetes service that provides access to the REST endpoint, defaults to `streams-endpoint-monitor`
 * `STREAMS_USER_SECRET` - Name of the secret from step 1, defaults to `streams-user`.
+* `NAMESPACE` - The OpenShift Namespace where the ImageStream resides, defaults to `openshift`
+* `SOURCE_REPOSITORY_URL` - The URL of the repository with your application source code, defaults to `https://github.com/IBMStreams/endpoint-monitor`
+
+### 6. Create a Route
+
+Create a route where the service is exposed. Use the Openshift Console and use menue:
+```
+Networking -> Routes -> Create Route
+```
+Chose you created service with `${NAME}` and choose as TLS Termination `Passthrough`.
+Public hostname for the route. If not specified, a hostname is generated.
 
 ## URL mapping
 
@@ -177,6 +198,8 @@ Example URLs within the cluster for *application-name* of `buses-em` in project 
  * `https://buses-em.myproject.svc:8443/transit/ports/info`for a job named `transit`:
  * `https://buses-em.myproject.svc:8443/streams/jobs/7/ports/info` for job 7 without an explicitly set job name:
  * `https://buses-em.myproject.svc:8443/transit/buses/locations/inject` for an injection endpoint with context `buses`, name `locations` in in job named `transit`.
+
+To acces the service from the outside, use the genereated hostname of the route.
  
 ## Swagger - EXPERIMENTAL
 
