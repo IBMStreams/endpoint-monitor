@@ -114,7 +114,7 @@ kubectl create secret generic streams-user --from-file=STREAMS_USERNAME=./user.t
 rm user.txt passwd.txt
 ```
 
-The name of the secret is used in step 4 as the `STREAMS_USER_SECRET` parameter.
+The name of the secret is used in step 5 as the `STREAMS_USER_SECRET` parameter.
 
 ### 2. Define images
 
