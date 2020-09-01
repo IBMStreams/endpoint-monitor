@@ -1,4 +1,4 @@
-To help you understand how to use endpoint-monitor, the following example shows a basic example, where a simple streams job is submitted, and publically exposed outside of the openshift cluster. 
+To help you understand how to use endpoint-monitor, the following example shows a basic use case, where a simple streams job is submitted, and publically exposed outside of the openshift cluster. 
 
 ## Instructions
 
