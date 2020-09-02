@@ -51,5 +51,9 @@ NOTE: This assumes you have an openshift cluster with CP4D and streams installed
   
     
 ### 2. Submit the streams application
-- TBC...
+- For this sample, we will be using the Streams-Rolling average app available [here](https://github.com/IBMStreams/sample.starter_notebooks/blob/latest/Streams-RollingAverageSample.ipynb)
+- This app has been included in the `file.ipynb`
+- Download and open the file `file.ipynb` in a python 3.6 environment
+- In the second cell under the title '# 3. Build and submit the application', change the cell values, adding in the streams user, the CP4D URL and the name of the streams instance you defined above
+- Run the notebook
   
