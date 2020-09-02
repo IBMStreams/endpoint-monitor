@@ -54,6 +54,8 @@ NOTE: This assumes you have an openshift cluster with CP4D and streams installed
 - For this sample, we will be using the Streams-Rolling average app available [here](https://github.com/IBMStreams/sample.starter_notebooks/blob/latest/Streams-RollingAverageSample.ipynb)
 - This app has been included in the `file.ipynb`
 - Download and open the file `file.ipynb` in a python 3.6 environment
-- In the second cell under the title '# 3. Build and submit the application', change the cell values, adding in the streams user, the CP4D URL and the name of the streams instance you defined above
-- Run the notebook
+- In the second cell under the title '3. Build and submit the application', change the cell values, adding in the streams user, the CP4D URL and the name of the streams instance you defined above
+- In the cell under the title '4. Connect to endpoint', change the cell values by adding the hostname from the service you created above, as well as the jobID of the job submitted in the earlier cells
+- Finally, run the last cell to view the data in real time. 
+- If you have the openshift web interface running, you can see under the route you created, the details. Of particular notability is the traffic in, and traffic out. These should correspond to the cell retrieving data
   
