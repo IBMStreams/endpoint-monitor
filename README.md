@@ -84,6 +84,9 @@ stream<Json> locations = com.ibm.streamsx.inet.rest::HTTPJSONInjection() {
 
 ## Setup
 
+**Tip**: You can run the `setupProxy.sh` script which has automated these steps. The only step you would need to do manually is create the job group in the Streams Console.
+
+
 Pick a name for the application (e.g. `buses-em`), this will be passed to *oc new-app* as the parameter `NAME` and will also be the name of the Kubernetes service exposing the REST endpoints.
 
 This name is referred to a `${NAME}` in the following steps.
