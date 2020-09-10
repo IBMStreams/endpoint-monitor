@@ -84,6 +84,9 @@ stream<Json> locations = com.ibm.streamsx.inet.rest::HTTPJSONInjection() {
 
 ## Setup
 
+**Tip**: You can run the `setupProxy.sh` script which has automated these steps. The only step you would need to do manually is create the job group in the Streams Console.
+
+
 Pick a name for the application (e.g. `buses-em`), this will be passed to *oc new-app* as the parameter `NAME` and will also be the name of the Kubernetes service exposing the REST endpoints.
 
 This name is referred to a `${NAME}` in the following steps.
@@ -118,12 +121,14 @@ The name of the secret is used in step 5 as the `STREAMS_USER_SECRET` parameter.
 
 ### 2. Define images
 
-If your `openshift` project does not contain the image `nginx:1.14` then add it using.
+If your `openshift` project does not contain the image `nginx:1.14` or the python:3.6 images then add either of them  using:
 
 ```
 oc login system:admin
 oc project openshift
 oc tag docker.io/centos/nginx-114-centos7:latest nginx:1.14
+oc tag docker.io/centos/python-36-centos7:latest python:3.6 
+
 ```
 
 If image `nginx:1.14` is not in project `openshift`, make sure that one project contains the image.
@@ -156,6 +161,10 @@ Click here to see details on [creating the certificates secret](https://github.c
 
 ### 5. Deploy application
 
+#### Create a job group in the Streams instance first
+
+From the Streams console application dashboard, open the menu, expand the instance, select Job Groups, and  click **Make job group**. Provide a name, such as "WebApps".
+
 Using an Openshift cluster run `oc new-app` to build and deploy the *endpoint-monitor* application. Use the same project where the streams is installed.
 The following command creates a *endpoint-monitor* application with name *streams-endpoint-monitor*
 
@@ -163,11 +172,11 @@ The following command creates a *endpoint-monitor* application with name *stream
 oc new-app \
  -f https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/develop/openshift/templates/streams-endpoints.json \
  -p STREAMS_INSTANCE_NAME=<IBMStreamsInstance name> \
- -p JOB_GROUP=<job group pattern> \
+ -p JOB_GROUP=<job group> \
 ```
 
 * `STREAMS_INSTANCE_NAME` - Name of the Kubernetes object `IBMStreamsInstance` defined in the yaml file when creating the Streams instance.
-* `JOB_GROUP` - Job group pattern. Only jobs with groups that match this pattern will be monitored for REST operators. **Currently only a actual job group can be supplied, not a regular expression.**
+* `JOB_GROUP` - Job group name. Only jobs submitted to the specified group will be monitored for REST operators. **Currently only a actual job group can be supplied, not a regular expression.** 
 
 The command may be used with additional parameters:
 * `NAME` - Name of the openshift/kubernetes service that provides access to the REST endpoint, defaults to `streams-endpoint-monitor`
@@ -177,11 +186,11 @@ The command may be used with additional parameters:
 
 ### 6. Create a Route
 
-Create a route where the service is exposed. Use the Openshift Console and use menue:
+Create a route where the service is exposed. Use the Openshift Console and use menu:
 ```
 Networking -> Routes -> Create Route
 ```
-Chose you created service with `${NAME}` and choose as TLS Termination `Passthrough`.
+Choose your created service with `${NAME}` and choose as TLS Termination `Passthrough`.
 Public hostname for the route. If not specified, a hostname is generated.
 
 ## URL mapping
