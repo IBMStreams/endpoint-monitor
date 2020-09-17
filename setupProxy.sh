@@ -15,7 +15,7 @@ else
       CPD_USER=admin
   fi
 
-  if [ ! $CPD_PASSWORD]
+  if [ ! $CPD_PASSWORD ]
   then
         CPD_PASSWORD=password
   fi
