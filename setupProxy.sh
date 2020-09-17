@@ -37,7 +37,7 @@ else
     echo "$CPD_USER" >user.txt
     echo "$CPD_PASSWORD" >password.txt
     echo "Creating secret"
-    oc create secret generic streams-user --from-file=user.txt --from-file=password.txt
+    oc create secret generic streams-user --from-file=STREAMS_USERNAME=user.txt --from-file=STREAMS_PASSWORD=password.txt
     rm user.txt password.txt
     oc new-app \
         -f https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/develop/openshift/templates/streams-endpoints.json \
