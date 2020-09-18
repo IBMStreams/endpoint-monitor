@@ -21,6 +21,8 @@ Here's a diagram showing the interaction of clients, endpoint-monitor and Stream
 
 <img width="932" alt="image" src="https://user-images.githubusercontent.com/3769612/68225608-8b1b0000-ffa5-11e9-895e-331a0acebb51.png">
 
+To view an example application, click [here](./docs/example/example.md)
+
 ## Streams application endpoints
 
 The Streams application containing endpoints must be submitted to a job group that the endpoint-monitor is configured to monitor. See Setup.
@@ -85,6 +87,9 @@ stream<Json> locations = com.ibm.streamsx.inet.rest::HTTPJSONInjection() {
 ## Setup
 
 **Tip**: You can run the `setupProxy.sh` script which has automated these steps. The only step you would need to do manually is create the job group in the Streams Console.
+ * Download the script `wget https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/develop/setupProxy.sh`
+ * Change permissions to make it executable `chmod +x ./setupProxy.sh`
+ * Run `./setupProxy.sh`
 
 
 Pick a name for the application (e.g. `buses-em`), this will be passed to *oc new-app* as the parameter `NAME` and will also be the name of the Kubernetes service exposing the REST endpoints.
@@ -127,7 +132,7 @@ If your `openshift` project does not contain the image `nginx:1.14` or the pytho
 oc login system:admin
 oc project openshift
 oc tag docker.io/centos/nginx-114-centos7:latest nginx:1.14
-oc tag docker.io/centos/python-36-centos7:latest python:3.6 
+oc tag docker.io/centos/python-36-centos7:latest python:3.6
 
 ```
 
@@ -143,13 +148,13 @@ By default the endpoint-monitor's RESTful service **does not require authenticat
 
 Basic authentication can be configured for all requests.
 
-Click here to see details on [basic authentication](https://github.com/IBMStreams/endpoint-monitor/blob/develop/docs/BASICAUTH.md)
+Click here to see details on [basic authentication](./docs/BASICAUTH.md)
 
 #### Webhook signature authentication
 
 Requests with a body can be authenticated using a signature and a shared secret.
 
-Click here to see details on [enabling signature authentication](https://github.com/IBMStreams/endpoint-monitor/blob/develop/docs/signature_auth.md)
+Click here to see details on [enabling signature authentication](./docs/signature_auth.md)
 
 Signature authentication can be an additional layer to other authentication mechanisms, such as basic authenication.
 
@@ -157,7 +162,7 @@ Signature authentication can be an additional layer to other authentication mech
 
 Optional - Create a kubernetes generic secret `${NAME}-streams-certs` that defines certificates to enable HTTPS between the Nginx reverse proxy and the endpoints within the Streams jobs.
 
-Click here to see details on [creating the certificates secret](https://github.com/IBMStreams/endpoint-monitor/blob/develop/docs/JETTYCERTS.md).
+Click here to see details on [creating the certificates secret](./docs/JETTYCERTS.md).
 
 ### 5. Deploy application
 
@@ -234,4 +239,4 @@ The python container monitors the Streams instance using the REST api through it
 
 The nginx container runs nginx pulling configuration from job endpoint `/opt/streams_job_configs/*.conf`. It also has a shell script that monitors the named pipe and executes its actions using `nginx -s`, e.g. `nginx -s reload`. (currently only `reload` is sent as an action).
 
-Click here to see the internal details on how [signature authentication](https://github.com/IBMStreams/endpoint-monitor/blob/develop/docs/internal/signature_verification.md) works
+Click here to see the internal details on how [signature authentication](./docs/internal/signature_verification.md) works
