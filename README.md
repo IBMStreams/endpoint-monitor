@@ -130,7 +130,7 @@ If your `openshift` project does not contain the image `nginx:1.14` or the pytho
 oc login system:admin
 oc project openshift
 oc tag docker.io/centos/nginx-114-centos7:latest nginx:1.14
-oc tag docker.io/centos/python-36-centos7:latest python:3.6 
+oc tag docker.io/centos/python-36-centos7:latest python:3.6
 
 ```
 

@@ -31,7 +31,7 @@ else
     oc project $NAMESPACE
 
     echo "Tagging Nginx and Python images"
-    oc tag docker.io/centos/python-36-centos7:latest python:3.6 # Uncomment if the tag isn't present
+    oc tag docker.io/centos/python-36-centos7:latest python:3.6
     oc tag docker.io/centos/nginx-114-centos7:latest nginx:1.14
 
     echo -n "$CPD_USER" >user.txt
