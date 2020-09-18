@@ -34,11 +34,11 @@ else
     oc tag docker.io/centos/python-36-centos7:latest python:3.6 # Uncomment if the tag isn't present
     oc tag docker.io/centos/nginx-114-centos7:latest nginx:1.14
 
-    echo "$CPD_USER" >user.txt
-    echo "$CPD_PASSWORD" >password.txt
+    echo -n "$CPD_USER" >user.txt
+    echo -n "$CPD_PASSWORD" >passwd.txt
     echo "Creating secret"
-    oc create secret generic streams-user --from-file=STREAMS_USERNAME=user.txt --from-file=STREAMS_PASSWORD=password.txt
-    rm user.txt password.txt
+    oc create secret generic streams-user --from-file=STREAMS_USERNAME=./user.txt --from-file=STREAMS_PASSWORD=./passwd.txt
+    # rm user.txt passwd.txt
     oc new-app \
         -f https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/develop/openshift/templates/streams-endpoints.json \
         -p NAME=$APP_NAME \
@@ -46,6 +46,7 @@ else
         -p JOB_GROUP=$JOB_GROUP \
         -p STREAMS_USER_SECRET=streams-user \
         -p NAMESPACE=$NAMESPACE
+
     oc create route passthrough --port="8443" -n $NAMESPACE --service="$APP_NAME" -o=json
 
     echo "Check host attribute in JSON output above for the proxy URL"
