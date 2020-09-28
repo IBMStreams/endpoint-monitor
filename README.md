@@ -86,10 +86,10 @@ stream<Json> locations = com.ibm.streamsx.inet.rest::HTTPJSONInjection() {
 
 ## Setup
 
-**Tip**: You can run the `setupProxy.sh` script which has automated these steps. The only step you would need to do manually is create the job group in the Streams Console.
- * Download the script `wget https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/develop/setupProxy.sh`
- * Change permissions to make it executable `chmod +x ./setupProxy.sh`
- * Run `./setupProxy.sh`
+> **Tip**: You can run the `setupProxy.sh` script which has automated these steps. The only step you would need to do manually is create the job group in the Streams Console.
+> * Download the script `wget https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/develop/setupProxy.sh`
+> * Change permissions to make it executable `chmod +x ./setupProxy.sh`
+> * Run `./setupProxy.sh`
 
 
 Pick a name for the application (e.g. `buses-em`), this will be passed to *oc new-app* as the parameter `NAME` and will also be the name of the Kubernetes service exposing the REST endpoints.
@@ -133,7 +133,6 @@ oc login system:admin
 oc project openshift
 oc tag docker.io/centos/nginx-114-centos7:latest nginx:1.14
 oc tag docker.io/centos/python-36-centos7:latest python:3.6
-
 ```
 
 If image `nginx:1.14` is not in project `openshift`, make sure that one project contains the image.
