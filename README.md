@@ -227,15 +227,15 @@ The path `swagger-ui.html` (e.g. `https://buses-em.myproject.svc:8443/swagger-ui
 
 ## Implementation notes
 
-The template uses the nginx and python 3.6 source to image (s2i) setups to define two containers (nginx & python) within a single pod. The two containers share a local volume (`/opt/streams_job_configs`) and communicate through a named pipe on the volume.
+The template uses the nginx and python 3.6 source to image (s2i) setups to define two containers (nginx & python) within a single pod. The two containers share a local volume (`/var/opt/streams-endpoint-monitor`) and communicate through a named pipe on the volume.
  * nginx 1.14 s2i - https://github.com/sclorg/nginx-container/tree/master/1.14
  * python 3.6 s2i - https://github.com/sclorg/s2i-python-container/tree/master/3.6
 
-The python container monitors the Streams instance using the REST api through its sws service and as jobs are submitted and canceled it updates each job's reverse proxy configuration in `/opt/streams_job_configs`. Once a job configuration has been written it sends a `reload` action through the named pipe.
+The python container monitors the Streams instance using the REST api through its sws service and as jobs are submitted and canceled it updates each job's reverse proxy configuration in `/var/opt/streams-endpoint-monitor/job-configs/`. Once a job configuration has been written it sends a `reload` action through the named pipe.
 
  * `https://em.myoproject.svc:8443/streams/jobs/7/ports/info` with a web-server in job 7:
 
 
-The nginx container runs nginx pulling configuration from job endpoint `/opt/streams_job_configs/*.conf`. It also has a shell script that monitors the named pipe and executes its actions using `nginx -s`, e.g. `nginx -s reload`. (currently only `reload` is sent as an action).
+The nginx container runs nginx pulling configuration from job endpoint `/var/opt/streams-endpoint-monitor/job-configs/*.conf`. It also has a shell script that monitors the named pipe and executes its actions using `nginx -s`, e.g. `nginx -s reload`. (currently only `reload` is sent as an action).
 
 Click here to see the internal details on how [signature authentication](./docs/internal/signature_verification.md) works
