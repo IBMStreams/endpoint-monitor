@@ -40,7 +40,7 @@ else
     oc create secret generic streams-user --from-file=STREAMS_USERNAME=./user.txt --from-file=STREAMS_PASSWORD=./passwd.txt
     rm user.txt passwd.txt
     oc new-app \
-        -f https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/develop/openshift/templates/streams-endpoints.json \
+        -f https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/develop/openshift/templates/streams-endpoints.yaml \
         -p NAME=$APP_NAME \
         -p STREAMS_INSTANCE_NAME=$INSTANCE \
         -p JOB_GROUP=$JOB_GROUP \
