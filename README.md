@@ -174,7 +174,7 @@ The following command creates a *endpoint-monitor* application with name *stream
 
 ```
 oc new-app \
- -f https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/develop/openshift/templates/streams-endpoints.json \
+ -f https://raw.githubusercontent.com/IBMStreams/endpoint-monitor/develop/openshift/templates/streams-endpoints.yaml \
  -p STREAMS_INSTANCE_NAME=<IBMStreamsInstance name> \
  -p JOB_GROUP=<job group> \
 ```
