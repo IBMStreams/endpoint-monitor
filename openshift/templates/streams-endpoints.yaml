@@ -1,0 +1,310 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: streams-endpoint-monitor
+  annotations:
+    openshift.io/display-name: Streams endpoint-monitor
+    description: >-
+      Nginx reverse proxy application that exposes REST endpoints from Streams
+      jobs. For more information about using this template, see
+      https://github.com/IBMStreams/endpoint-monitor/blob/develop/README.md.
+    tags: "streams,nginx,endpoint-monitor"
+    iconClass: icon-nginx
+    openshift.io/long-description: >-
+      This template defines resources needed to develop a Nginx reverse proxy
+      that exposes REST endpoints from Streams jobs,  including a build
+      configuration and application deployment configuration.
+    openshift.io/provider-display-name: IBMStreams
+    openshift.io/documentation-url: "https://github.com/IBMStreams/endpoint-monitor"
+    openshift.io/support-url: "https://github.com/IBMStreams/endpoint-monitor/issues"
+message: >-
+  The following service(s) have been created in your project: ${NAME}.
+
+
+  For more information about using this template, see
+  https://github.com/IBMStreams/endpoint-monitor/blob/develop/README.md.
+labels:
+  template: streams-endpoint-monitor
+objects:
+  - kind: ImageStream
+    apiVersion: v1
+    metadata:
+      name: "${NAME}-endpoint-monitor"
+      annotations:
+        description: Monitors Streams jobs for REST endpoint operators.
+  - kind: BuildConfig
+    apiVersion: v1
+    metadata:
+      name: "${NAME}-endpoint-monitor"
+      annotations:
+        description: Defines how to build the endpoint-monitor image.
+        template.alpha.openshift.io/wait-for-ready: "true"
+    spec:
+      source:
+        type: Git
+        git:
+          uri: "${SOURCE_REPOSITORY_URL}"
+          ref: "${SOURCE_REPOSITORY_REF}"
+        contextDir: "${CONTEXT_DIR}"
+      strategy:
+        type: Source
+        sourceStrategy:
+          from:
+            kind: ImageStreamTag
+            namespace: "${NAMESPACE}"
+            name: "python:3.6"
+      output:
+        to:
+          kind: ImageStreamTag
+          name: "${NAME}-endpoint-monitor:latest"
+      triggers:
+        - type: ImageChange
+        - type: ConfigChange
+        - type: GitHub
+          github:
+            secret: "${GITHUB_WEBHOOK_SECRET}"
+        - type: Generic
+          generic:
+            secret: "${GENERIC_WEBHOOK_SECRET}"
+  - kind: ImageStream
+    apiVersion: v1
+    metadata:
+      name: "${NAME}-nginx"
+      annotations:
+        description: endpoint-monitor Nginx image
+  - kind: BuildConfig
+    apiVersion: v1
+    metadata:
+      name: "${NAME}-nginx"
+      annotations:
+        description: Defines how to build the nginx image
+        template.alpha.openshift.io/wait-for-ready: "true"
+    spec:
+      source:
+        type: Git
+        git:
+          uri: "${SOURCE_REPOSITORY_URL}"
+          ref: "${SOURCE_REPOSITORY_REF}"
+        contextDir: "${CONTEXT_DIR}"
+      strategy:
+        type: Source
+        sourceStrategy:
+          from:
+            kind: ImageStreamTag
+            namespace: "${NAMESPACE}"
+            name: "nginx:1.14"
+      output:
+        to:
+          kind: ImageStreamTag
+          name: "${NAME}-nginx:latest"
+      triggers:
+        - type: ImageChange
+        - type: ConfigChange
+        - type: GitHub
+          github:
+            secret: "${GITHUB_WEBHOOK_SECRET}"
+        - type: Generic
+          generic:
+            secret: "${GENERIC_WEBHOOK_SECRET}"
+  - kind: DeploymentConfig
+    apiVersion: v1
+    metadata:
+      name: "${NAME}"
+      annotations:
+        description: IBM Streams endpoint monitor
+        template.alpha.openshift.io/wait-for-ready: "true"
+    spec:
+      strategy:
+        type: Rolling
+      triggers:
+        - type: ImageChange
+          imageChangeParams:
+            automatic: true
+            containerNames:
+              - streams-nginx
+            from:
+              kind: ImageStreamTag
+              name: "${NAME}-nginx:latest"
+        - type: ImageChange
+          imageChangeParams:
+            automatic: true
+            containerNames:
+              - streams-endpoint-monitor
+            from:
+              kind: ImageStreamTag
+              name: "${NAME}-endpoint-monitor:latest"
+        - type: ConfigChange
+      replicas: 1
+      selector:
+        name: "${NAME}"
+      template:
+        metadata:
+          name: "${NAME}"
+          labels:
+            name: "${NAME}"
+        spec:
+          volumes:
+            - name: shared-disk
+              emptyDir: {}
+            - name: server-cert
+              secret:
+                secretName: "${NAME}-cert"
+            - name: server-auth
+              secret:
+                secretName: "${NAME}-authentication"
+                optional: true
+            - name: streams-certs
+              secret:
+                secretName: "${NAME}-streams-certs"
+                optional: true
+          containers:
+            - name: streams-nginx
+              image: "${NAME}-nginx:latest"
+              volumeMounts:
+                - name: shared-disk
+                  mountPath: /var/opt/streams-endpoint-monitor
+                - name: server-cert
+                  mountPath: /var/run/secrets/streams-endpoint-monitor/server-cert
+                  readOnly: true
+                - name: server-auth
+                  mountPath: /var/run/secrets/streams-endpoint-monitor/server-auth
+                  readOnly: true
+              ports:
+                - containerPort: 8443
+              readinessProbe:
+                timeoutSeconds: 3
+                initialDelaySeconds: 3
+                httpGet:
+                  scheme: HTTPS
+                  path: /liveness-probe
+                  port: 8443
+              livenessProbe:
+                timeoutSeconds: 3
+                initialDelaySeconds: 30
+                httpGet:
+                  scheme: HTTPS
+                  path: /liveness-probe
+                  port: 8443
+              resources:
+                limits:
+                  memory: "${MEMORY_LIMIT}"
+              env: []
+            - name: streams-endpoint-monitor
+              image: "${NAME}-endpoint-monitor:latest"
+              volumeMounts:
+                - name: shared-disk
+                  mountPath: /var/opt/streams-endpoint-monitor
+                - name: streams-certs
+                  mountPath: /var/run/secrets/streams-endpoint-monitor/streams-certs
+                  readOnly: true
+                  optional: true
+                - name: server-auth
+                  mountPath: /var/run/secrets/streams-endpoint-monitor/server-auth
+                  readOnly: true
+              readinessProbe:
+                timeoutSeconds: 1
+                initialDelaySeconds: 3
+                exec:
+                  command:
+                    - /bin/cat
+                    - /var/opt/streams-endpoint-monitor/monitor.active
+              livenessProbe:
+                timeoutSeconds: 1
+                initialDelaySeconds: 10
+                exec:
+                  command:
+                    - /bin/cat
+                    - /var/opt/streams-endpoint-monitor/monitor.active
+              resources:
+                limits:
+                  memory: "${MEMORY_LIMIT}"
+              env:
+                - name: STREAMSX_ENDPOINT_NAME
+                  value: "${NAME}"
+                - name: STREAMSX_ENDPOINT_INSTANCE
+                  value: "${STREAMS_INSTANCE_NAME}"
+                - name: STREAMSX_ENDPOINT_JOB_GROUP
+                  value: "${JOB_GROUP}"
+              envFrom:
+                - secretRef:
+                    name: "${STREAMS_USER_SECRET}"
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      name: "${NAME}"
+      annotations:
+        service.alpha.openshift.io/serving-cert-secret-name: "${NAME}-cert"
+        description: Exposes IBM Streams application endpoints
+    spec:
+      ports:
+        - name: web
+          port: 8443
+          targetPort: 8443
+      selector:
+        name: "${NAME}"
+      type: NodePort
+parameters:
+  - name: NAME
+    displayName: Name
+    description: The name assigned to all of the frontend objects defined in this template.
+    required: true
+    value: streams-endpoint-monitor
+  - name: STREAMS_INSTANCE_NAME
+    displayName: Streams Instance name
+    description: Name of the IBM Streams instance (kind IBMStreamsInstance) to monitor.
+    required: true
+  - name: STREAMS_USER_SECRET
+    displayName: Streams user secret
+    description: >-
+      Secret containing STREAMS_USERNAME and STREAMS_PASSWORD for the user to
+      connect to the Streams REST api.
+    required: true
+    value: streams-user
+  - name: JOB_GROUP
+    displayName: Streams job group regular expression
+    description: Regular expression to match monitored job groups.
+    required: true
+  - name: NAMESPACE
+    displayName: Namespace
+    description: The OpenShift Namespace where the ImageStream resides.
+    required: true
+    value: openshift
+  - name: MEMORY_LIMIT
+    displayName: Memory Limit
+    description: Maximum amount of memory the container can use.
+    required: true
+    value: 512Mi
+  - name: SOURCE_REPOSITORY_URL
+    displayName: Git Repository URL
+    description: The URL of the repository with your application source code.
+    required: true
+    value: "https://github.com/Karsten12/endpoint-monitor"
+  - name: SOURCE_REPOSITORY_REF
+    displayName: Git Reference
+    description: >-
+      Set this to a branch name, tag or other ref of your repository if you are
+      not using the default branch.
+    value: "kf_develop"
+  - name: CONTEXT_DIR
+    displayName: Context Directory
+    description: >-
+      Set this to the relative path to your project if it is not in the root of
+      your repository.
+  - name: APPLICATION_DOMAIN
+    displayName: Application Hostname
+    description: >-
+      The exposed hostname that will route to the nginx service, if left blank a
+      value will be defaulted.
+    value: ""
+  - name: GITHUB_WEBHOOK_SECRET
+    displayName: GitHub Webhook Secret
+    description: >-
+      Github trigger secret.  A difficult to guess string encoded as part of the
+      webhook URL.  Not encrypted.
+    generate: expression
+    from: "[a-zA-Z0-9]{40}"
+  - name: GENERIC_WEBHOOK_SECRET
+    displayName: Generic Webhook Secret
+    description: A secret string used to configure the Generic webhook.
+    generate: expression
+    from: "[a-zA-Z0-9]{40}"
