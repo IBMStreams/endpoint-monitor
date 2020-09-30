@@ -278,13 +278,12 @@ parameters:
     displayName: Git Repository URL
     description: The URL of the repository with your application source code.
     required: true
-    value: "https://github.com/Karsten12/endpoint-monitor"
+    value: "https://github.com/IBMStreams/endpoint-monitor"
   - name: SOURCE_REPOSITORY_REF
     displayName: Git Reference
     description: >-
       Set this to a branch name, tag or other ref of your repository if you are
       not using the default branch.
-    value: "kf_develop"
   - name: CONTEXT_DIR
     displayName: Context Directory
     description: >-
